@@ -1,47 +1,65 @@
 /* =========================================================
-   ANVI BAKERS — GLOBAL CSS
-========================================================= */
+   ANVI BAKERS - FINAL GLOBAL CSS
+   ========================================================= */
 
-html {
-  width: 100%;
-  max-width: 100%;
-  scroll-behavior: smooth;
-  overflow-x: hidden;
-  scroll-padding-top: 90px;
-}
+:root {
+  --primary: #8f4f5d;
+  --primary-dark: #713b47;
+  --primary-light: #f6e5e7;
+  --accent: #a75c6c;
 
-body {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
+  --text: #302124;
+  --text-light: #756568;
+  --muted: #8d7d7f;
 
-  margin: 0;
-  padding: 0;
+  --cream: #fffaf8;
+  --white: #ffffff;
+  --soft: #f9eeeb;
 
-  overflow-x: hidden;
+  --border: #eadbd8;
+  --shadow: 0 20px 55px rgba(70, 37, 42, 0.08);
 
-  font-family: Arial, Helvetica, sans-serif;
-
-  background: #fffaf8;
-  color: #2b2022;
-
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-#root,
-.app {
-  width: 100%;
-  max-width: 100%;
-  min-height: 100vh;
-
-  overflow-x: hidden;
+  --max-width: 1400px;
 }
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  max-width: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 90px;
+  overflow-x: hidden;
+}
+
+body {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+
+  overflow-x: hidden;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  background: var(--cream);
+  color: var(--text);
+
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 img {
@@ -53,11 +71,16 @@ button,
 input,
 select,
 textarea {
-  font-family: inherit;
+  font: inherit;
 }
 
 button {
   cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 a {
@@ -76,10 +99,14 @@ textarea {
   -webkit-appearance: none;
 }
 
+::selection {
+  background: #f1cfd4;
+  color: #302124;
+}
 
 /* =========================================================
    NAVBAR
-========================================================= */
+   ========================================================= */
 
 .navbar {
   position: sticky;
@@ -92,59 +119,64 @@ textarea {
 
   border-bottom: 1px solid #f0ded9;
 
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .navbar-inner {
   width: 100%;
-  max-width: 1400px;
+  max-width: var(--max-width);
 
   min-height: 82px;
 
   margin: 0 auto;
-  padding: 15px 6%;
+  padding: 14px 6%;
 
   display: flex;
   align-items: center;
-  justify-content: space-between;
 
   gap: 25px;
 }
 
-
 /* =========================================================
    LOGO
-========================================================= */
+   ========================================================= */
 
 .logo {
   flex-shrink: 0;
 
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+
+  border: 0;
+  padding: 0;
+
+  background: transparent;
 
   text-align: center;
   line-height: 0.85;
-
-  text-decoration: none;
 
   cursor: pointer;
 }
 
 .logo-main {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
 
   font-size: 32px;
   font-weight: 700;
 
-  color: #8f4f5d;
+  color: var(--primary);
 }
 
 .logo-sub {
   display: block;
 
-  margin-top: 6px;
+  margin-top: 7px;
 
   font-size: 9px;
   font-weight: 700;
@@ -154,19 +186,17 @@ textarea {
   color: #8b7779;
 }
 
-
 /* =========================================================
-   DESKTOP NAVIGATION
-========================================================= */
+   DESKTOP NAV
+   ========================================================= */
 
 .nav-links {
   display: flex;
   align-items: center;
 
-  gap: 30px;
+  gap: 28px;
 
   margin-left: auto;
-  margin-right: 10px;
 }
 
 .nav-links a {
@@ -179,7 +209,7 @@ textarea {
   text-decoration: none;
 
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
 
   transition: color 0.2s ease;
 }
@@ -197,23 +227,22 @@ textarea {
 
   border-radius: 10px;
 
-  background: #a75c6c;
+  background: var(--accent);
 
   transition: width 0.25s ease;
 }
 
 .nav-links a:hover {
-  color: #a75c6c;
+  color: var(--accent);
 }
 
 .nav-links a:hover::after {
   width: 100%;
 }
 
-
 /* =========================================================
    ORDER BUTTON
-========================================================= */
+   ========================================================= */
 
 .order-btn {
   flex-shrink: 0;
@@ -224,18 +253,16 @@ textarea {
 
   min-height: 46px;
 
-  padding: 12px 22px;
+  padding: 12px 23px;
 
-  border: none;
+  border: 0;
   border-radius: 30px;
 
-  background: #8f4f5d;
-  color: #ffffff;
+  background: var(--primary);
+  color: var(--white);
 
   font-size: 14px;
   font-weight: 700;
-
-  text-decoration: none;
 
   white-space: nowrap;
 
@@ -246,7 +273,7 @@ textarea {
 }
 
 .order-btn:hover {
-  background: #713b47;
+  background: var(--primary-dark);
 
   transform: translateY(-2px);
 
@@ -254,18 +281,17 @@ textarea {
     0 8px 20px rgba(113, 59, 71, 0.2);
 }
 
-
 /* =========================================================
    MOBILE MENU BUTTON
-========================================================= */
+   ========================================================= */
 
 .mobile-menu-btn {
   display: none;
 
-  flex-shrink: 0;
-
   width: 44px;
   height: 44px;
+
+  margin-left: auto;
 
   padding: 9px;
 
@@ -274,13 +300,11 @@ textarea {
 
   background: #fffafa;
 
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  flex-direction: column;
 
   gap: 5px;
-
-  cursor: pointer;
 }
 
 .mobile-menu-btn span {
@@ -291,15 +315,12 @@ textarea {
 
   border-radius: 10px;
 
-  background: #8f4f5d;
+  background: var(--primary);
 
   transition:
     transform 0.25s ease,
     opacity 0.25s ease;
 }
-
-
-/* HAMBURGER → X */
 
 .mobile-menu-btn.active span:nth-child(1) {
   transform: translateY(7px) rotate(45deg);
@@ -313,19 +334,17 @@ textarea {
   transform: translateY(-7px) rotate(-45deg);
 }
 
-
 /* =========================================================
    MOBILE MENU
-========================================================= */
+   ========================================================= */
 
 .mobile-menu {
   display: none;
 }
 
-
 /* =========================================================
    HERO
-========================================================= */
+   ========================================================= */
 
 .hero {
   width: 100%;
@@ -333,7 +352,7 @@ textarea {
 
   min-height: 650px;
 
-  padding: 70px 7%;
+  padding: 75px 7%;
 
   display: grid;
 
@@ -351,7 +370,7 @@ textarea {
       #f9e5e4 0,
       transparent 30%
     ),
-    #fffaf8;
+    var(--cream);
 }
 
 .hero-content {
@@ -363,7 +382,7 @@ textarea {
 .section-tag {
   margin: 0 0 18px;
 
-  color: #a75c6c;
+  color: var(--accent);
 
   font-size: 12px;
   font-weight: 700;
@@ -371,24 +390,26 @@ textarea {
   letter-spacing: 3px;
 }
 
-.hero h2 {
+.hero h1 {
   margin: 0;
 
-  font-family: Georgia, "Times New Roman", serif;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
 
   font-size: clamp(45px, 6vw, 78px);
 
   line-height: 1.05;
 
-  color: #302124;
+  color: var(--text);
 }
 
-.hero h2 span,
+.hero h1 span,
 .section-heading h2 span,
 .about-content h2 span,
-.order-cta h2 span,
 .contact-heading h2 span {
-  color: #a75c6c;
+  color: var(--accent);
 }
 
 .description {
@@ -396,7 +417,7 @@ textarea {
 
   margin: 25px 0;
 
-  color: #756568;
+  color: var(--text-light);
 
   line-height: 1.8;
 
@@ -430,21 +451,21 @@ textarea {
 }
 
 .primary-btn {
-  border: none;
+  border: 0;
 
-  background: #8f4f5d;
-  color: #ffffff;
+  background: var(--primary);
+  color: var(--white);
 }
 
 .secondary-btn {
   border: 1px solid #c9959f;
 
   background: transparent;
-  color: #8f4f5d;
+  color: var(--primary);
 }
 
 .primary-btn:hover {
-  background: #713b47;
+  background: var(--primary-dark);
 
   transform: translateY(-2px);
 
@@ -453,7 +474,7 @@ textarea {
 }
 
 .secondary-btn:hover {
-  background: #f6e5e7;
+  background: var(--primary-light);
 
   transform: translateY(-2px);
 }
@@ -479,15 +500,14 @@ textarea {
 }
 
 .features span {
-  color: #8d7d7f;
+  color: var(--muted);
 
   font-size: 11px;
 }
 
-
 /* =========================================================
    HERO IMAGE
-========================================================= */
+   ========================================================= */
 
 .hero-image {
   position: relative;
@@ -535,7 +555,6 @@ textarea {
   bottom: 7%;
 
   width: 105px;
-  min-width: 105px;
 
   aspect-ratio: 1 / 1;
 
@@ -548,16 +567,19 @@ textarea {
 
   border-radius: 50%;
 
-  background: #ffffff;
+  background: var(--white);
 
   box-shadow:
     0 15px 35px rgba(70, 37, 42, 0.15);
 }
 
 .hero-badge strong {
-  color: #8f4f5d;
+  color: var(--primary);
 
-  font-family: Georgia, "Times New Roman", serif;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
 
   font-size: 19px;
 }
@@ -570,10 +592,9 @@ textarea {
   font-size: 10px;
 }
 
-
 /* =========================================================
    CATEGORY BAR
-========================================================= */
+   ========================================================= */
 
 .category-bar {
   width: 100%;
@@ -588,7 +609,7 @@ textarea {
 
   flex-wrap: wrap;
 
-  background: #ffffff;
+  background: var(--white);
 
   border-top: 1px solid #f2dfdb;
   border-bottom: 1px solid #f2dfdb;
@@ -603,7 +624,6 @@ textarea {
   border-radius: 30px;
 
   background: #fffafa;
-
   color: #70444d;
 
   font-size: 13px;
@@ -620,10 +640,9 @@ textarea {
   transform: translateY(-2px);
 }
 
-
 /* =========================================================
    SECTION HEADING
-========================================================= */
+   ========================================================= */
 
 .section-heading {
   width: 100%;
@@ -637,13 +656,16 @@ textarea {
 .section-heading h2 {
   margin: 0;
 
-  font-family: Georgia, "Times New Roman", serif;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
 
   font-size: clamp(35px, 5vw, 55px);
 
   line-height: 1.1;
 
-  color: #302124;
+  color: var(--text);
 }
 
 .section-description {
@@ -656,21 +678,20 @@ textarea {
   font-size: 15px;
 }
 
-
 /* =========================================================
    PRODUCTS
-========================================================= */
+   ========================================================= */
 
 .products-section {
   width: 100%;
 
   padding: 100px 7%;
 
-  background: #fffaf8;
+  background: var(--cream);
 }
 
 .alternate-section {
-  background: #ffffff;
+  background: var(--white);
 }
 
 .product-grid {
@@ -696,7 +717,7 @@ textarea {
   display: flex;
   flex-direction: column;
 
-  background: #ffffff;
+  background: var(--white);
 
   border: 1px solid #f0dedb;
 
@@ -744,7 +765,7 @@ textarea {
   transform: scale(1.06);
 }
 
-.product-image span {
+.fresh-badge {
   position: absolute;
 
   top: 15px;
@@ -754,15 +775,54 @@ textarea {
 
   border-radius: 20px;
 
-  background: #ffffff;
-
-  color: #8f4f5d;
+  background: var(--white);
+  color: var(--primary);
 
   font-size: 11px;
   font-weight: 700;
 
   box-shadow:
     0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.image-fallback {
+  width: 100%;
+  height: 100%;
+
+  padding: 25px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f7e7e5,
+      #eed6d4
+    );
+
+  color: var(--primary);
+}
+
+.image-fallback strong {
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 20px;
+}
+
+.image-fallback span {
+  margin-top: 8px;
+
+  color: #8b7779;
+
+  font-size: 12px;
 }
 
 .product-info {
@@ -777,7 +837,7 @@ textarea {
 }
 
 .product-info small {
-  color: #a75c6c;
+  color: var(--accent);
 
   text-transform: uppercase;
 
@@ -790,7 +850,10 @@ textarea {
 .product-info h3 {
   margin: 8px 0 12px;
 
-  font-family: Georgia, "Times New Roman", serif;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
 
   font-size: 21px;
 
@@ -798,7 +861,7 @@ textarea {
 
   min-height: 55px;
 
-  color: #302124;
+  color: var(--text);
 }
 
 .price-info {
@@ -812,7 +875,7 @@ textarea {
 }
 
 .price-info strong {
-  color: #8f4f5d;
+  color: var(--primary);
 
   font-size: 17px;
 }
@@ -826,11 +889,10 @@ textarea {
 
   padding: 12px 13px;
 
-  border: none;
+  border: 0;
   border-radius: 25px;
 
-  background: #f6e5e7;
-
+  background: var(--primary-light);
   color: #7d4451;
 
   font-size: 13px;
@@ -843,17 +905,15 @@ textarea {
 }
 
 .product-order:hover {
-  background: #8f4f5d;
-
-  color: #ffffff;
+  background: var(--primary);
+  color: var(--white);
 
   transform: translateY(-1px);
 }
 
-
 /* =========================================================
    ABOUT
-========================================================= */
+   ========================================================= */
 
 .about-section {
   width: 100%;
@@ -870,12 +930,11 @@ textarea {
 
   gap: 80px;
 
-  background: #f9eeeb;
+  background: var(--soft);
 }
 
 .about-image {
   width: 100%;
-
   min-width: 0;
 }
 
@@ -899,13 +958,16 @@ textarea {
 .about-content h2 {
   margin: 0 0 25px;
 
-  font-family: Georgia, "Times New Roman", serif;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
 
   font-size: clamp(38px, 5vw, 58px);
 
   line-height: 1.1;
 
-  color: #302124;
+  color: var(--text);
 }
 
 .about-content > p:not(.section-tag) {
@@ -916,17 +978,16 @@ textarea {
   margin-bottom: 15px;
 }
 
-
 /* =========================================================
-   CONTACT / ORDER
-========================================================= */
+   CONTACT
+   ========================================================= */
 
 .contact-section {
   width: 100%;
 
   padding: 110px 7%;
 
-  background: #ffffff;
+  background: var(--white);
 }
 
 .contact-heading {
@@ -941,13 +1002,16 @@ textarea {
 .contact-heading h2 {
   margin: 0;
 
-  font-family: Georgia, "Times New Roman", serif;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
 
   font-size: clamp(38px, 5vw, 58px);
 
   line-height: 1.1;
 
-  color: #302124;
+  color: var(--text);
 }
 
 .contact-heading > p:last-child {
@@ -980,7 +1044,7 @@ textarea {
 
   padding: 35px;
 
-  background: #f9eeeb;
+  background: var(--soft);
 
   border-radius: 25px;
 }
@@ -988,11 +1052,14 @@ textarea {
 .contact-info h3 {
   margin: 0 0 15px;
 
-  font-family: Georgia, "Times New Roman", serif;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
 
   font-size: 30px;
 
-  color: #302124;
+  color: var(--text);
 }
 
 .contact-info > p {
@@ -1026,10 +1093,9 @@ textarea {
   overflow-wrap: anywhere;
 }
 
-
 /* =========================================================
    ORDER FORM
-========================================================= */
+   ========================================================= */
 
 .order-form {
   width: 100%;
@@ -1037,14 +1103,13 @@ textarea {
 
   padding: 35px;
 
-  background: #ffffff;
+  background: var(--white);
 
-  border: 1px solid #eadbd8;
+  border: 1px solid var(--border);
 
   border-radius: 25px;
 
-  box-shadow:
-    0 20px 55px rgba(70, 37, 42, 0.08);
+  box-shadow: var(--shadow);
 }
 
 .form-row {
@@ -1095,7 +1160,6 @@ textarea {
   outline: none;
 
   background: #fffafa;
-
   color: #3f3032;
 
   font-size: 14px;
@@ -1116,14 +1180,10 @@ textarea {
 .form-group textarea:focus {
   border-color: #b87a85;
 
-  background: #ffffff;
+  background: var(--white);
 
   box-shadow:
     0 0 0 3px rgba(184, 122, 133, 0.1);
-}
-
-.form-group input:invalid:not(:placeholder-shown) {
-  border-color: #d68b8b;
 }
 
 .form-group textarea {
@@ -1138,8 +1198,16 @@ textarea {
   cursor: pointer;
 
   background-image:
-    linear-gradient(45deg, transparent 50%, #8f4f5d 50%),
-    linear-gradient(135deg, #8f4f5d 50%, transparent 50%);
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      var(--primary) 50%
+    ),
+    linear-gradient(
+      135deg,
+      var(--primary) 50%,
+      transparent 50%
+    );
 
   background-position:
     calc(100% - 18px) 20px,
@@ -1154,10 +1222,68 @@ textarea {
   padding-right: 40px;
 }
 
+/* =========================================================
+   PHONE
+   ========================================================= */
+
+.phone-input-wrapper {
+  width: 100%;
+
+  display: flex;
+  align-items: stretch;
+}
+
+.phone-prefix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 55px;
+
+  padding: 0 10px;
+
+  border: 1px solid #e5d5d2;
+  border-right: 0;
+
+  border-radius: 12px 0 0 12px;
+
+  background: #f7eeee;
+
+  color: var(--primary);
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.phone-input-wrapper input {
+  border-radius: 0 12px 12px 0;
+}
 
 /* =========================================================
-   PRICE BOX
-========================================================= */
+   ADDRESS TITLE
+   ========================================================= */
+
+.address-title {
+  margin: 25px 0 18px;
+
+  padding-top: 20px;
+
+  border-top: 1px solid #eee0dd;
+
+  color: var(--primary);
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   PRICE
+   ========================================================= */
 
 .selected-price {
   width: 100%;
@@ -1185,31 +1311,50 @@ textarea {
 }
 
 .selected-price strong {
-  color: #8f4f5d;
+  color: var(--primary);
 
   font-size: 20px;
 
   text-align: right;
 }
 
+/* =========================================================
+   SUCCESS
+   ========================================================= */
+
+.order-success {
+  margin-bottom: 18px;
+
+  padding: 14px 16px;
+
+  border: 1px solid #cfe5d5;
+  border-radius: 12px;
+
+  background: #eef9f1;
+
+  color: #28613a;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+}
 
 /* =========================================================
    FORM SUBMIT
-========================================================= */
+   ========================================================= */
 
 .form-submit {
   width: 100%;
 
   min-height: 52px;
 
-  border: none;
+  border: 0;
   border-radius: 30px;
 
   padding: 15px 20px;
 
-  background: #8f4f5d;
-
-  color: #ffffff;
+  background: var(--primary);
+  color: var(--white);
 
   font-size: 15px;
   font-weight: 700;
@@ -1220,8 +1365,8 @@ textarea {
     box-shadow 0.2s ease;
 }
 
-.form-submit:hover {
-  background: #713b47;
+.form-submit:hover:not(:disabled) {
+  background: var(--primary-dark);
 
   transform: translateY(-2px);
 
@@ -1229,14 +1374,13 @@ textarea {
     0 10px 25px rgba(113, 59, 71, 0.18);
 }
 
-.form-submit:active {
+.form-submit:active:not(:disabled) {
   transform: translateY(0);
 }
 
-
 /* =========================================================
    FOOTER
-========================================================= */
+   ========================================================= */
 
 .footer {
   width: 100%;
@@ -1245,7 +1389,7 @@ textarea {
 
   background: #241b1d;
 
-  color: #ffffff;
+  color: var(--white);
 }
 
 .footer-top {
@@ -1268,13 +1412,11 @@ textarea {
 }
 
 .footer-logo {
-  display: inline-flex;
-
   align-items: center;
 }
 
 .footer-logo .logo-main {
-  color: #ffffff;
+  color: var(--white);
 }
 
 .footer-logo .logo-sub {
@@ -1302,7 +1444,7 @@ textarea {
 
   border-radius: 25px;
 
-  background: #ffffff;
+  background: var(--white);
 
   color: #70414b;
 
@@ -1352,7 +1494,7 @@ textarea {
 }
 
 .footer-column a:hover {
-  color: #ffffff;
+  color: var(--white);
 }
 
 .footer-bottom {
@@ -1380,13 +1522,11 @@ textarea {
   margin: 0;
 }
 
-
 /* =========================================================
-   LARGE TABLET / SMALL DESKTOP
-========================================================= */
+   LARGE TABLET
+   ========================================================= */
 
 @media (max-width: 1100px) {
-
   .navbar-inner {
     padding-left: 4%;
     padding-right: 4%;
@@ -1398,19 +1538,16 @@ textarea {
 
   .hero {
     gap: 35px;
-
     padding-left: 5%;
     padding-right: 5%;
   }
 
   .product-grid {
-    grid-template-columns:
-      repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .about-section {
     gap: 50px;
-
     padding-left: 5%;
     padding-right: 5%;
   }
@@ -1420,27 +1557,33 @@ textarea {
     padding-left: 5%;
     padding-right: 5%;
   }
-
 }
 
+/* Mobile: 2 product cards side-by-side */
+@media (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
 
+  .product-card {
+    width: 100%;
+    min-width: 0;
+  }
+}
 /* =========================================================
    TABLET
-========================================================= */
+   ========================================================= */
 
 @media (max-width: 900px) {
-
   .navbar-inner {
     min-height: 72px;
 
     padding: 12px 4%;
   }
 
-  .nav-links {
-    display: none;
-  }
-
-  .navbar-inner > .order-btn {
+  .nav-links,
+  .desktop-order-btn {
     display: none;
   }
 
@@ -1511,42 +1654,35 @@ textarea {
     font-weight: 600;
 
     border-bottom: 1px solid #f1dfdc;
-
-    transition:
-      background 0.2s ease,
-      color 0.2s ease;
   }
 
   .mobile-menu a:hover {
-    color: #8f4f5d;
+    color: var(--primary);
 
     background: #fff4f2;
   }
 
-  .mobile-menu .mobile-order-btn {
+  .mobile-order-btn {
+    width: 100%;
+
     margin-top: 15px;
 
     padding: 14px;
 
-    text-align: center;
-
-    border: none;
+    border: 0;
 
     border-radius: 30px;
 
-    background: #8f4f5d;
+    background: var(--primary);
 
-    color: #ffffff;
+    color: var(--white);
+
+    font-weight: 700;
   }
 
-  .mobile-menu .mobile-order-btn:hover {
-    background: #713b47;
-
-    color: #ffffff;
+  .mobile-order-btn:hover {
+    background: var(--primary-dark);
   }
-
-
-  /* HERO */
 
   .hero {
     grid-template-columns: 1fr;
@@ -1578,16 +1714,10 @@ textarea {
     max-width: 500px;
   }
 
-
-  /* PRODUCTS */
-
   .product-grid {
     grid-template-columns:
       repeat(2, minmax(0, 1fr));
   }
-
-
-  /* ABOUT */
 
   .about-section {
     grid-template-columns: 1fr;
@@ -1609,9 +1739,6 @@ textarea {
     margin: 0 auto;
   }
 
-
-  /* CONTACT */
-
   .contact-container {
     grid-template-columns: 1fr;
 
@@ -1620,23 +1747,17 @@ textarea {
     max-width: 800px;
   }
 
-
-  /* FOOTER */
-
   .footer-top {
     grid-template-columns:
       repeat(2, minmax(0, 1fr));
   }
-
 }
-
 
 /* =========================================================
    MOBILE
-========================================================= */
+   ========================================================= */
 
 @media (max-width: 600px) {
-
   html {
     scroll-padding-top: 75px;
   }
@@ -1662,12 +1783,7 @@ textarea {
     height: 42px;
   }
 
-
-  /* HERO */
-
   .hero {
-    width: 100%;
-
     min-height: auto;
 
     padding: 55px 5%;
@@ -1682,7 +1798,7 @@ textarea {
     letter-spacing: 2px;
   }
 
-  .hero h2 {
+  .hero h1 {
     font-size: 43px;
 
     line-height: 1.08;
@@ -1730,7 +1846,6 @@ textarea {
     bottom: 3%;
 
     width: 85px;
-    min-width: 85px;
 
     padding: 10px;
   }
@@ -1742,9 +1857,6 @@ textarea {
   .hero-badge span {
     font-size: 9px;
   }
-
-
-  /* CATEGORY */
 
   .category-bar {
     padding: 15px 4%;
@@ -1758,14 +1870,9 @@ textarea {
     font-size: 12px;
   }
 
-
-  /* SECTION */
-
   .products-section,
   .contact-section,
   .about-section {
-    width: 100%;
-
     padding: 75px 5%;
   }
 
@@ -1782,26 +1889,13 @@ textarea {
     font-size: 14px;
   }
 
-
-  /* PRODUCTS */
-
   .product-grid {
-    width: 100%;
-
     grid-template-columns: 1fr;
 
     gap: 22px;
   }
 
-  .product-card {
-    width: 100%;
-
-    max-width: 100%;
-  }
-
   .product-image {
-    width: 100%;
-
     height: 280px;
   }
 
@@ -1815,9 +1909,6 @@ textarea {
     font-size: 20px;
   }
 
-
-  /* ABOUT */
-
   .about-image img {
     height: 400px;
 
@@ -1828,20 +1919,11 @@ textarea {
     font-size: 39px;
   }
 
-
-  /* CONTACT */
-
   .contact-heading {
     margin-bottom: 40px;
   }
 
-  .contact-container {
-    width: 100%;
-  }
-
   .contact-info {
-    width: 100%;
-
     padding: 25px 20px;
   }
 
@@ -1849,12 +1931,7 @@ textarea {
     font-size: 27px;
   }
 
-
-  /* FORM */
-
   .order-form {
-    width: 100%;
-
     padding: 25px 20px;
 
     border-radius: 20px;
@@ -1874,10 +1951,6 @@ textarea {
     padding: 14px;
   }
 
-  .form-group textarea {
-    min-height: 130px;
-  }
-
   .selected-price {
     align-items: flex-start;
 
@@ -1895,9 +1968,6 @@ textarea {
 
     font-size: 14px;
   }
-
-
-  /* FOOTER */
 
   .footer {
     padding: 60px 5% 25px;
@@ -1922,16 +1992,13 @@ textarea {
 
     text-align: center;
   }
-
 }
 
-
 /* =========================================================
-   EXTRA SMALL MOBILE
-========================================================= */
+   EXTRA SMALL
+   ========================================================= */
 
 @media (max-width: 380px) {
-
   .navbar-inner {
     padding-left: 3%;
     padding-right: 3%;
@@ -1957,13 +2024,12 @@ textarea {
     padding-right: 4%;
   }
 
-  .hero h2 {
+  .hero h1 {
     font-size: 37px;
   }
 
   .hero-badge {
     width: 75px;
-    min-width: 75px;
   }
 
   .hero-badge strong {
@@ -1991,16 +2057,13 @@ textarea {
     padding-left: 17px;
     padding-right: 17px;
   }
-
 }
 
-
 /* =========================================================
-   VERY SMALL DEVICES
-========================================================= */
+   VERY SMALL
+   ========================================================= */
 
 @media (max-width: 320px) {
-
   .logo-main {
     font-size: 22px;
   }
@@ -2009,7 +2072,7 @@ textarea {
     letter-spacing: 2px;
   }
 
-  .hero h2 {
+  .hero h1 {
     font-size: 34px;
   }
 
@@ -2022,13 +2085,11 @@ textarea {
 
     font-size: 11px;
   }
-
 }
-
 
 /* =========================================================
    ACCESSIBILITY
-========================================================= */
+   ========================================================= */
 
 :focus-visible {
   outline: 3px solid rgba(167, 92, 108, 0.35);
@@ -2037,7 +2098,6 @@ textarea {
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   html {
     scroll-behavior: auto;
   }
@@ -2048,4 +2108,202 @@ textarea {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
   }
+}
+
+/* =========================================================
+   EXTRA FORM + IMAGE STYLES
+========================================================= */
+
+.phone-input-wrapper {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+}
+
+.phone-prefix {
+  min-width: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #e5d5d2;
+  border-right: none;
+  border-radius: 12px 0 0 12px;
+
+  background: #f8eeee;
+  color: #70444d;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.phone-input-wrapper input {
+  border-radius: 0 12px 12px 0 !important;
+}
+
+.address-title {
+  margin: 28px 0 18px;
+
+  color: #302124;
+
+  font-family: Georgia, "Times New Roman", serif;
+
+  font-size: 22px;
+  font-weight: 700;
+
+  padding-bottom: 10px;
+
+  border-bottom: 1px solid #eadbd8;
+}
+
+.image-fallback {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 20px;
+
+  background:
+    radial-gradient(
+      circle at top,
+      #f9e5e4,
+      #f4e7e5
+    );
+
+  color: #8f4f5d;
+}
+
+.image-fallback strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+}
+
+.image-fallback span {
+  margin-top: 8px;
+
+  color: #8b7779;
+
+  font-size: 12px;
+}
+
+.fresh-badge {
+  z-index: 2;
+}
+
+.order-success {
+  width: 100%;
+
+  margin-bottom: 18px;
+  padding: 15px 18px;
+
+  border-radius: 12px;
+
+  background: #eaf7ed;
+  border: 1px solid #c9e8d0;
+
+  color: #28743a;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.form-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+
+  transform: none;
+  box-shadow: none;
+}
+
+.form-submit:disabled:hover {
+  background: #8f4f5d;
+
+  transform: none;
+  box-shadow: none;
+}
+
+/* Cream roll section spacing */
+
+#cream-rolls {
+  scroll-margin-top: 90px;
+}
+
+/* Better product image fallback */
+
+.product-image {
+  position: relative;
+}
+
+.product-image img {
+  background: #f4e7e5;
+}
+
+/* Mobile phone input */
+
+@media (max-width: 600px) {
+  .phone-prefix {
+    min-width: 52px;
+  }
+
+  .address-title {
+    font-size: 20px;
+  }
+}
+
+.delivery-charge-box {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #fff8f0;
+  border: 1px solid #f0d8bd;
+}
+
+.delivery-charge-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.delivery-charge-row span {
+  font-weight: 600;
+}
+
+.delivery-charge-row strong {
+  color: #b85c00;
+}
+
+.delivery-charge-box small {
+  display: block;
+  margin-top: 8px;
+  line-height: 1.5;
+  color: #777;
+}
+
+.final-total-box {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding: 17px;
+  border-radius: 12px;
+  background: #fff;
+  border: 2px solid #d9a441;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.final-total-box span {
+  font-weight: 700;
+}
+
+.final-total-box strong {
+  font-size: 18px;
 }
