@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import "./index.css";
-import heroImage from "./assets/hero.png";
+import heroImage from "./assets/images.png";
 
 function App() {
   const whatsappNumber = "919198299898";
