@@ -2557,7 +2557,7 @@ Anvi Bakers`;
             </p>
 
             <p>
-              Ayodhya, Uttar Pradesh
+              Khanpur Masodha, Ayodhya, Uttar Pradesh
             </p>
 
             <p>
