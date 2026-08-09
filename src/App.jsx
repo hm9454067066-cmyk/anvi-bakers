@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import "./index.css";
 import heroImage from "./assets/hero.png";
 
@@ -8,10 +8,9 @@ function App() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedWeight, setSelectedWeight] = useState("");
   const [quantity, setQuantity] = useState("");
-  const [selectedPrice, setSelectedPrice] = useState(0);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedPrice, setSelectedPrice] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [orderSuccess, setOrderSuccess] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // ================= PRODUCTS =================
 
@@ -164,15 +163,7 @@ function App() {
     },
   ];
 
-  const allProducts = useMemo(
-    () => [...cakes, ...pastries, ...cookies],
-    []
-  );
-
-  // ================= DATE =================
-
-  const today = new Date();
-  const minDeliveryDate = today.toISOString().split("T")[0];
+  const allProducts = [...cakes, ...pastries, ...cookies];
 
   // ================= HELPERS =================
 
@@ -188,38 +179,58 @@ function App() {
     })}`;
   };
 
-  const scrollToSection = (id) => {
-    setMobileMenuOpen(false);
+  const getTodayDate = () => {
+    const today = new Date();
 
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const scrollToSection = (id) => {
     document.getElementById(id)?.scrollIntoView({
       behavior: "smooth",
       block: "start",
     });
   };
 
-  // ================= PRICE =================
+  // ================= PRICE CALCULATION =================
 
   const calculatePrice = (
     item = selectedItem,
     weight = selectedWeight,
     qty = quantity
   ) => {
-    if (!item) return 0;
+    if (!item) {
+      return 0;
+    }
 
     const numericQuantity = Number(qty);
 
-    if (!Number.isFinite(numericQuantity) || numericQuantity <= 0) {
+    if (
+      !Number.isFinite(numericQuantity) ||
+      numericQuantity <= 0
+    ) {
       return 0;
     }
 
     if (item.pricePerKg) {
       const numericWeight = Number(weight);
 
-      if (!Number.isFinite(numericWeight) || numericWeight <= 0) {
+      if (
+        !Number.isFinite(numericWeight) ||
+        numericWeight <= 0
+      ) {
         return 0;
       }
 
-      return Number(item.pricePerKg) * numericWeight * numericQuantity;
+      return (
+        Number(item.pricePerKg) *
+        numericWeight *
+        numericQuantity
+      );
     }
 
     if (item.price) {
@@ -229,19 +240,21 @@ function App() {
     return 0;
   };
 
-  // ================= PRODUCT SELECT =================
+  // ================= PRODUCT SELECTION =================
 
   const selectProduct = (item) => {
     setSelectedItem(item);
     setSelectedWeight("");
     setQuantity("");
-    setSelectedPrice(0);
+    setSelectedPrice("");
     setOrderSuccess(false);
 
     setTimeout(() => {
       scrollToSection("contact");
-    }, 100);
+    }, 50);
   };
+
+  // ================= PRODUCT CHANGE =================
 
   const handleProductChange = (e) => {
     const productName = e.target.value;
@@ -254,14 +267,15 @@ function App() {
       setSelectedItem(null);
       setSelectedWeight("");
       setQuantity("");
-      setSelectedPrice(0);
+      setSelectedPrice("");
       return;
     }
 
     setSelectedItem(item);
     setSelectedWeight("");
     setQuantity("");
-    setSelectedPrice(0);
+    setSelectedPrice("");
+    setOrderSuccess(false);
   };
 
   // ================= WEIGHT =================
@@ -298,109 +312,139 @@ function App() {
 
   // ================= PHONE VALIDATION =================
 
-  const validatePhone = (phone) => {
-    const cleaned = phone.replace(/\D/g, "");
+  const handlePhoneChange = (e) => {
+    let value = e.target.value;
 
-    if (cleaned.length !== 10) {
-      return false;
+    // Sirf numbers allow karo
+    value = value.replace(/\D/g, "");
+
+    // Maximum 10 digits
+    value = value.slice(0, 10);
+
+    e.target.value = value;
+
+    if (value.length === 0) {
+      setPhoneError("");
+      return;
     }
 
-    return /^[6-9]\d{9}$/.test(cleaned);
+    if (value.length < 10) {
+      setPhoneError(
+        `Enter ${10 - value.length} more digit${
+          10 - value.length === 1 ? "" : "s"
+        }.`
+      );
+      return;
+    }
+
+    // Indian mobile number 6-9 se start hona chahiye
+    if (!/^[6-9]\d{9}$/.test(value)) {
+      setPhoneError(
+        "Please enter a valid 10-digit Indian mobile number."
+      );
+      return;
+    }
+
+    setPhoneError("");
   };
 
-  // ================= ORDER =================
+  // ================= WHATSAPP ORDER =================
 
   const handleOrder = (e) => {
     e.preventDefault();
 
-    if (isSubmitting) return;
-
-    const form = e.currentTarget;
-    const formData = new FormData(form);
+    const formData = new FormData(e.currentTarget);
 
     const name = formData.get("name")?.trim();
     const phone = formData.get("phone")?.trim();
     const product = formData.get("product");
     const date = formData.get("date");
-
-    const house = formData.get("house")?.trim();
-    const street = formData.get("street")?.trim();
+    const houseAddress =
+      formData.get("houseAddress")?.trim();
     const area = formData.get("area")?.trim();
     const city = formData.get("city")?.trim();
-    const state = formData.get("state")?.trim();
     const pincode = formData.get("pincode")?.trim();
-
     const landmark =
-      formData.get("landmark")?.trim() || "Not provided";
-
+      formData.get("landmark")?.trim() ||
+      "Not provided";
     const requirements =
-      formData.get("requirements")?.trim() || "None";
+      formData.get("requirements")?.trim() ||
+      "None";
 
     // NAME
-
     if (!name) {
       alert("Please enter your name.");
       return;
     }
 
     // PHONE
-
-    if (!validatePhone(phone)) {
-      alert(
-        "Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8 or 9."
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      setPhoneError(
+        "Please enter a valid 10-digit Indian mobile number."
       );
+
+      alert(
+        "Please enter a valid 10-digit Indian mobile number."
+      );
+
       return;
     }
 
     // PRODUCT
-
     if (!product || !selectedItem) {
       alert("Please select a product.");
       return;
     }
 
     // CAKE WEIGHT
-
-    if (selectedItem.pricePerKg && !selectedWeight) {
+    if (
+      selectedItem?.pricePerKg &&
+      !selectedWeight
+    ) {
       alert("Please select cake weight.");
       return;
     }
 
     // QUANTITY
-
-    if (!quantity || Number(quantity) <= 0) {
+    if (!quantity) {
       alert("Please select quantity.");
       return;
     }
 
     // DATE
-
     if (!date) {
       alert("Please select delivery date.");
       return;
     }
 
-    if (date < minDeliveryDate) {
-      alert("Past delivery dates are not allowed.");
+    // PAST DATE PROTECTION
+    const today = getTodayDate();
+
+    if (date < today) {
+      alert(
+        "Past delivery dates are not allowed. Please select today or a future date."
+      );
       return;
     }
 
     // ADDRESS
-
     if (
-      !house ||
-      !street ||
+      !houseAddress ||
       !area ||
       !city ||
-      !state ||
       !pincode
     ) {
-      alert("Please complete your delivery address.");
+      alert(
+        "Please complete all delivery address details."
+      );
       return;
     }
 
+    // PINCODE VALIDATION
     if (!/^\d{6}$/.test(pincode)) {
-      alert("Please enter a valid 6-digit PIN code.");
+      alert(
+        "Please enter a valid 6-digit PIN code."
+      );
       return;
     }
 
@@ -410,27 +454,26 @@ function App() {
       quantity
     );
 
-    if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
+    if (
+      !Number.isFinite(totalAmount) ||
+      totalAmount <= 0
+    ) {
       alert(
         "Please select product, weight and quantity correctly."
       );
       return;
     }
 
-    setIsSubmitting(true);
+    const finalPrice = formatPrice(totalAmount);
 
-    const weightText = selectedItem.pricePerKg
-      ? `${selectedWeight} Kg`
-      : "Not applicable";
+    const weightText =
+      selectedItem?.pricePerKg
+        ? `${selectedWeight} Kg`
+        : "Not applicable";
 
-    const fullAddress = [
-      house,
-      street,
-      area,
-      city,
-      state,
-      `PIN: ${pincode}`,
-    ].join(", ");
+    const fullAddress = `${houseAddress}, ${area}, ${city} - ${pincode}`;
+
+    // ================= WHATSAPP MESSAGE =================
 
     const message = `Hello Anvi Bakers,
 
@@ -442,7 +485,7 @@ Customer Name:
 ${name}
 
 Phone Number:
-+91 ${phone}
+${phone}
 
 Product:
 ${product}
@@ -454,36 +497,16 @@ Quantity:
 ${quantity}
 
 Total Price:
-${formatPrice(totalAmount)}
+${finalPrice}
 
 Delivery Date:
 ${date}
 
-DELIVERY ADDRESS
-
-House / Flat:
-${house}
-
-Street / Road:
-${street}
-
-Area / Locality:
-${area}
-
-City:
-${city}
-
-State:
-${state}
-
-PIN Code:
-${pincode}
+Delivery Address:
+${fullAddress}
 
 Landmark:
 ${landmark}
-
-Full Address:
-${fullAddress}
 
 Special Requirements:
 ${requirements}
@@ -494,135 +517,53 @@ Thank you.
 Anvi Bakers`;
 
     const whatsappURL =
-      `https://wa.me/${whatsappNumber}?text=` +
-      encodeURIComponent(message);
+      `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+        message
+      )}`;
 
     setOrderSuccess(true);
 
-    setTimeout(() => {
-      window.open(
-        whatsappURL,
-        "_blank",
-        "noopener,noreferrer"
-      );
-
-      setIsSubmitting(false);
-    }, 500);
+    window.open(
+      whatsappURL,
+      "_blank",
+      "noopener,noreferrer"
+    );
   };
 
-  // ================= ESCAPE MOBILE MENU =================
-
-  useEffect(() => {
-    const handleEscape = (event) => {
-      if (event.key === "Escape") {
-        setMobileMenuOpen(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleEscape);
-
-    return () => {
-      window.removeEventListener("keydown", handleEscape);
-    };
-  }, []);
-
-  // ================= UI =================
-
   return (
-    <div className="app">
-
+    <div>
       {/* ================= NAVBAR ================= */}
 
       <header className="navbar">
-
-        <div
-          className="logo"
-          onClick={() => scrollToSection("home")}
-          style={{ cursor: "pointer" }}
-        >
+        <div className="logo">
           <h1>Anvi</h1>
           <span>BAKERS</span>
         </div>
 
-        <nav
-          className={
-            mobileMenuOpen
-              ? "nav-menu mobile-open"
-              : "nav-menu"
-          }
-        >
-          <a
-            href="#home"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Home
-          </a>
-
-          <a
-            href="#cakes"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Cakes
-          </a>
-
-          <a
-            href="#pastries"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Pastries
-          </a>
-
-          <a
-            href="#cookies"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Cookies
-          </a>
-
-          <a
-            href="#about"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            About
-          </a>
-
-          <a
-            href="#contact"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Contact
-          </a>
+        <nav>
+          <a href="#home">Home</a>
+          <a href="#cakes">Cakes</a>
+          <a href="#pastries">Pastries</a>
+          <a href="#cookies">Cookies</a>
+          <a href="#about">About</a>
+          <a href="#contact">Contact</a>
         </nav>
 
         <button
           className="order-btn"
-          onClick={() => scrollToSection("contact")}
+          onClick={() =>
+            scrollToSection("contact")
+          }
         >
           Order Now
         </button>
-
-        <button
-          className="mobile-menu-button"
-          type="button"
-          aria-label="Open navigation menu"
-          aria-expanded={mobileMenuOpen}
-          onClick={() =>
-            setMobileMenuOpen((prev) => !prev)
-          }
-        >
-          {mobileMenuOpen ? "Close" : "Menu"}
-        </button>
-
       </header>
 
       {/* ================= HERO ================= */}
 
       <main id="home">
-
         <section className="hero">
-
           <div className="hero-content">
-
             <p className="tagline">
               Freshly Baked With Love
             </p>
@@ -642,7 +583,6 @@ Anvi Bakers`;
             </p>
 
             <div className="hero-buttons">
-
               <button
                 className="primary-btn"
                 onClick={() =>
@@ -660,11 +600,9 @@ Anvi Bakers`;
               >
                 Order Now
               </button>
-
             </div>
 
             <div className="features">
-
               <div>
                 <strong>100% Fresh</strong>
                 <span>Made fresh daily</span>
@@ -679,37 +617,28 @@ Anvi Bakers`;
                 <strong>Made With Love</strong>
                 <span>For your special day</span>
               </div>
-
             </div>
-
           </div>
 
           <div className="hero-image">
-
             <div className="hero-image-frame">
-
               <img
                 src={heroImage}
-                alt="Fresh cake from Anvi Bakers"
+                alt="Anvi Bakers Cake"
               />
-
             </div>
 
             <div className="hero-badge">
               <strong>Fresh</strong>
               <span>Every Day</span>
             </div>
-
           </div>
-
         </section>
-
       </main>
 
       {/* ================= CATEGORY BAR ================= */}
 
       <section className="category-bar">
-
         <button
           onClick={() =>
             scrollToSection("cakes")
@@ -741,7 +670,6 @@ Anvi Bakers`;
         >
           Order
         </button>
-
       </section>
 
       {/* ================= CAKES ================= */}
@@ -750,9 +678,7 @@ Anvi Bakers`;
         id="cakes"
         className="products-section"
       >
-
         <div className="section-heading">
-
           <p className="section-tag">
             OUR CAKES
           </p>
@@ -766,44 +692,36 @@ Anvi Bakers`;
             Choose your favourite cake and
             order it by weight.
           </p>
-
         </div>
 
         <div className="product-grid">
-
           {cakes.map((cake) => (
-
             <div
               className="product-card"
               key={cake.name}
             >
-
               <div className="product-image">
-
                 <img
                   src={cake.image}
                   alt={cake.name}
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.style.display =
-                      "none";
-                  }}
                 />
 
                 <span>Fresh</span>
-
               </div>
 
               <div className="product-info">
-
-                <small>{cake.category}</small>
+                <small>
+                  {cake.category}
+                </small>
 
                 <h3>{cake.name}</h3>
 
                 <p className="price-info">
                   Starting from{" "}
                   <strong>
-                    {formatPrice(cake.pricePerKg)}
+                    {formatPrice(
+                      cake.pricePerKg
+                    )}
                     /kg
                   </strong>
                 </p>
@@ -816,15 +734,10 @@ Anvi Bakers`;
                 >
                   Order Cake
                 </button>
-
               </div>
-
             </div>
-
           ))}
-
         </div>
-
       </section>
 
       {/* ================= PASTRIES ================= */}
@@ -833,9 +746,7 @@ Anvi Bakers`;
         id="pastries"
         className="products-section alternate-section"
       >
-
         <div className="section-heading">
-
           <p className="section-tag">
             FRESH PASTRIES
           </p>
@@ -848,37 +759,27 @@ Anvi Bakers`;
           <p className="section-description">
             Perfect for a quick sweet treat.
           </p>
-
         </div>
 
         <div className="product-grid">
-
           {pastries.map((item) => (
-
             <div
               className="product-card"
               key={item.name}
             >
-
               <div className="product-image">
-
                 <img
                   src={item.image}
                   alt={item.name}
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.style.display =
-                      "none";
-                  }}
                 />
 
                 <span>Fresh</span>
-
               </div>
 
               <div className="product-info">
-
-                <small>{item.category}</small>
+                <small>
+                  {item.category}
+                </small>
 
                 <h3>{item.name}</h3>
 
@@ -897,15 +798,10 @@ Anvi Bakers`;
                 >
                   Order Pastry
                 </button>
-
               </div>
-
             </div>
-
           ))}
-
         </div>
-
       </section>
 
       {/* ================= COOKIES ================= */}
@@ -914,9 +810,7 @@ Anvi Bakers`;
         id="cookies"
         className="products-section"
       >
-
         <div className="section-heading">
-
           <p className="section-tag">
             FRESHLY BAKED
           </p>
@@ -930,37 +824,27 @@ Anvi Bakers`;
             Perfectly baked cookies made
             with premium ingredients.
           </p>
-
         </div>
 
         <div className="product-grid">
-
           {cookies.map((item) => (
-
             <div
               className="product-card"
               key={item.name}
             >
-
               <div className="product-image">
-
                 <img
                   src={item.image}
                   alt={item.name}
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.style.display =
-                      "none";
-                  }}
                 />
 
                 <span>Fresh</span>
-
               </div>
 
               <div className="product-info">
-
-                <small>{item.category}</small>
+                <small>
+                  {item.category}
+                </small>
 
                 <h3>{item.name}</h3>
 
@@ -979,15 +863,10 @@ Anvi Bakers`;
                 >
                   Order Cookies
                 </button>
-
               </div>
-
             </div>
-
           ))}
-
         </div>
-
       </section>
 
       {/* ================= ABOUT ================= */}
@@ -996,19 +875,14 @@ Anvi Bakers`;
         id="about"
         className="about-section"
       >
-
         <div className="about-image">
-
           <img
             src="https://images.unsplash.com/photo-1519869325930-281384150729?auto=format&fit=crop&w=1000&q=90"
             alt="Anvi Bakers"
-            loading="lazy"
           />
-
         </div>
 
         <div className="about-content">
-
           <p className="section-tag">
             ABOUT ANVI BAKERS
           </p>
@@ -1041,9 +915,7 @@ Anvi Bakers`;
           >
             Order Now
           </button>
-
         </div>
-
       </section>
 
       {/* ================= ORDER SECTION ================= */}
@@ -1052,9 +924,7 @@ Anvi Bakers`;
         id="contact"
         className="contact-section"
       >
-
         <div className="contact-heading">
-
           <p className="section-tag">
             PLACE YOUR ORDER
           </p>
@@ -1069,15 +939,12 @@ Anvi Bakers`;
             quantity, delivery date and
             complete delivery address.
           </p>
-
         </div>
 
         <div className="contact-container">
-
           {/* CONTACT INFORMATION */}
 
           <div className="contact-info">
-
             <h3>Anvi Bakers</h3>
 
             <p>
@@ -1087,35 +954,28 @@ Anvi Bakers`;
             </p>
 
             <div className="contact-item">
-
               <strong>WhatsApp</strong>
 
               <span>
                 +91 9198299898
               </span>
-
             </div>
 
             <div className="contact-item">
-
               <strong>Location</strong>
 
               <span>
                 Ayodhya, Uttar Pradesh
               </span>
-
             </div>
 
             <div className="contact-item">
-
               <strong>Opening Hours</strong>
 
               <span>
                 10:00 AM - 9:00 PM
               </span>
-
             </div>
-
           </div>
 
           {/* ORDER FORM */}
@@ -1124,15 +984,12 @@ Anvi Bakers`;
             className="order-form"
             onSubmit={handleOrder}
           >
-
             {/* NAME + PHONE */}
 
             <div className="form-row">
-
               <div className="form-group">
-
                 <label>
-                  Your Name *
+                  Your Name
                 </label>
 
                 <input
@@ -1140,16 +997,13 @@ Anvi Bakers`;
                   name="name"
                   placeholder="Enter your name"
                   autoComplete="name"
-                  maxLength="60"
                   required
                 />
-
               </div>
 
               <div className="form-group">
-
                 <label>
-                  Phone Number *
+                  Phone Number
                 </label>
 
                 <input
@@ -1158,22 +1012,30 @@ Anvi Bakers`;
                   placeholder="10-digit mobile number"
                   inputMode="numeric"
                   autoComplete="tel"
-                  maxLength="10"
+                  maxLength={10}
                   pattern="[6-9][0-9]{9}"
+                  onInput={handlePhoneChange}
                   required
                 />
 
+                {phoneError && (
+                  <small
+                    style={{
+                      color: "#c0392b",
+                      display: "block",
+                      marginTop: "6px",
+                    }}
+                  >
+                    {phoneError}
+                  </small>
+                )}
               </div>
-
             </div>
 
             {/* PRODUCT */}
 
             <div className="form-group">
-
-              <label>
-                Product *
-              </label>
+              <label>Product</label>
 
               <select
                 name="product"
@@ -1185,68 +1047,51 @@ Anvi Bakers`;
                 }
                 required
               >
-
                 <option value="">
                   Select Product
                 </option>
 
                 <optgroup label="Cakes">
-
                   {cakes.map((cake) => (
-
                     <option
                       key={cake.name}
                       value={cake.name}
                     >
                       {cake.name}
                     </option>
-
                   ))}
-
                 </optgroup>
 
                 <optgroup label="Pastries">
-
                   {pastries.map((item) => (
-
                     <option
                       key={item.name}
                       value={item.name}
                     >
                       {item.name}
                     </option>
-
                   ))}
-
                 </optgroup>
 
                 <optgroup label="Cookies">
-
                   {cookies.map((item) => (
-
                     <option
                       key={item.name}
                       value={item.name}
                     >
                       {item.name}
                     </option>
-
                   ))}
-
                 </optgroup>
-
               </select>
-
             </div>
 
             {/* CAKE WEIGHT */}
 
             {selectedItem?.pricePerKg && (
-
               <div className="form-group">
-
                 <label>
-                  Select Cake Weight *
+                  Select Cake Weight
                 </label>
 
                 <select
@@ -1257,7 +1102,6 @@ Anvi Bakers`;
                   }
                   required
                 >
-
                   <option value="">
                     Select Weight
                   </option>
@@ -1277,30 +1121,15 @@ Anvi Bakers`;
                   <option value="3">
                     3 Kg
                   </option>
-
-                  <option value="4">
-                    4 Kg
-                  </option>
-
-                  <option value="5">
-                    5 Kg
-                  </option>
-
                 </select>
-
               </div>
-
             )}
 
             {/* QUANTITY + DATE */}
 
             <div className="form-row">
-
               <div className="form-group">
-
-                <label>
-                  Quantity *
-                </label>
+                <label>Quantity</label>
 
                 <select
                   name="quantity"
@@ -1310,7 +1139,6 @@ Anvi Bakers`;
                   }
                   required
                 >
-
                   <option value="">
                     Select Quantity
                   </option>
@@ -1323,187 +1151,117 @@ Anvi Bakers`;
                   <option value="6">6</option>
                   <option value="10">10</option>
                   <option value="20">20</option>
-
                 </select>
-
               </div>
 
               <div className="form-group">
-
                 <label>
-                  Delivery Date *
+                  Delivery Date
                 </label>
 
                 <input
                   type="date"
                   name="date"
-                  min={minDeliveryDate}
+                  min={getTodayDate()}
                   required
                 />
-
               </div>
-
             </div>
 
             {/* DELIVERY ADDRESS */}
 
-            <div className="address-title">
-              Delivery Address
+            <div className="form-group">
+              <label>
+                House / Flat / Street Address
+              </label>
+
+              <textarea
+                name="houseAddress"
+                rows="3"
+                placeholder="House number, flat number, street, building..."
+                autoComplete="street-address"
+                required
+              />
             </div>
 
             <div className="form-row">
-
               <div className="form-group">
-
                 <label>
-                  House / Flat *
-                </label>
-
-                <input
-                  type="text"
-                  name="house"
-                  placeholder="House / Flat No."
-                  autoComplete="address-line1"
-                  required
-                />
-
-              </div>
-
-              <div className="form-group">
-
-                <label>
-                  Street / Road *
-                </label>
-
-                <input
-                  type="text"
-                  name="street"
-                  placeholder="Street / Road"
-                  autoComplete="address-line2"
-                  required
-                />
-
-              </div>
-
-            </div>
-
-            <div className="form-row">
-
-              <div className="form-group">
-
-                <label>
-                  Area / Locality *
+                  Area / Locality
                 </label>
 
                 <input
                   type="text"
                   name="area"
-                  placeholder="Area / Locality"
+                  placeholder="Enter area or locality"
                   required
                 />
-
               </div>
 
               <div className="form-group">
-
-                <label>
-                  City *
-                </label>
+                <label>City</label>
 
                 <input
                   type="text"
                   name="city"
-                  placeholder="City"
-                  autoComplete="address-level2"
+                  placeholder="Enter city"
                   defaultValue="Ayodhya"
                   required
                 />
-
               </div>
-
             </div>
 
             <div className="form-row">
-
               <div className="form-group">
-
-                <label>
-                  State *
-                </label>
-
-                <input
-                  type="text"
-                  name="state"
-                  placeholder="State"
-                  autoComplete="address-level1"
-                  defaultValue="Uttar Pradesh"
-                  required
-                />
-
-              </div>
-
-              <div className="form-group">
-
-                <label>
-                  PIN Code *
-                </label>
+                <label>PIN Code</label>
 
                 <input
                   type="text"
                   name="pincode"
-                  placeholder="6-digit PIN"
+                  placeholder="6-digit PIN code"
                   inputMode="numeric"
-                  maxLength="6"
+                  maxLength={6}
                   pattern="[0-9]{6}"
-                  autoComplete="postal-code"
+                  onInput={(e) => {
+                    e.target.value =
+                      e.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 6);
+                  }}
                   required
                 />
-
               </div>
 
-            </div>
+              <div className="form-group">
+                <label>
+                  Landmark
+                </label>
 
-            {/* LANDMARK */}
-
-            <div className="form-group">
-
-              <label>
-                Landmark / Area
-              </label>
-
-              <input
-                type="text"
-                name="landmark"
-                placeholder="Nearby landmark"
-                maxLength="100"
-              />
-
+                <input
+                  type="text"
+                  name="landmark"
+                  placeholder="Nearby landmark"
+                />
+              </div>
             </div>
 
             {/* PRICE */}
 
             <div className="selected-price">
-
-              <span>
-                Total Price
-              </span>
+              <span>Total Price</span>
 
               <strong>
-
-                {selectedPrice > 0
+                {selectedPrice
                   ? formatPrice(
                       selectedPrice
                     )
                   : "Select product, options & quantity"}
-
               </strong>
-
             </div>
 
             {/* SPECIAL REQUIREMENTS */}
 
             <div className="form-group">
-
               <label>
                 Special Requirements
               </label>
@@ -1512,20 +1270,24 @@ Anvi Bakers`;
                 name="requirements"
                 rows="5"
                 placeholder="Cake message, design, flavour, custom requirements..."
-                maxLength="500"
               />
-
             </div>
 
-            {/* SUCCESS */}
+            {/* SUCCESS MESSAGE */}
 
             {orderSuccess && (
-
-              <div className="order-success">
-                Order details prepared successfully.
-                WhatsApp is opening now.
+              <div
+                style={{
+                  padding: "12px 15px",
+                  marginBottom: "15px",
+                  borderRadius: "8px",
+                  background: "#eaf8ee",
+                  color: "#237a3b",
+                  fontSize: "14px",
+                }}
+              >
+                Your order details are ready. WhatsApp is opening for confirmation.
               </div>
-
             )}
 
             {/* SUBMIT */}
@@ -1533,33 +1295,22 @@ Anvi Bakers`;
             <button
               type="submit"
               className="form-submit"
-              disabled={isSubmitting}
             >
-              {isSubmitting
-                ? "Preparing Order..."
-                : "Send Order on WhatsApp"}
+              Send Order on WhatsApp
             </button>
-
           </form>
-
         </div>
-
       </section>
 
       {/* ================= FOOTER ================= */}
 
       <footer className="footer">
-
         <div className="footer-top">
-
           <div className="footer-brand">
-
             <div className="logo footer-logo">
-
               <h1>Anvi</h1>
 
               <span>BAKERS</span>
-
             </div>
 
             <p>
@@ -1575,11 +1326,9 @@ Anvi Bakers`;
             >
               WhatsApp Us
             </a>
-
           </div>
 
           <div className="footer-column">
-
             <h4>Explore</h4>
 
             <a href="#home">Home</a>
@@ -1587,11 +1336,9 @@ Anvi Bakers`;
             <a href="#pastries">Pastries</a>
             <a href="#cookies">Cookies</a>
             <a href="#about">About Us</a>
-
           </div>
 
           <div className="footer-column">
-
             <h4>Categories</h4>
 
             <a href="#cakes">
@@ -1613,11 +1360,9 @@ Anvi Bakers`;
             <a href="#cookies">
               Fresh Cookies
             </a>
-
           </div>
 
           <div className="footer-column">
-
             <h4>Contact</h4>
 
             <p>+91 9198299898</p>
@@ -1629,13 +1374,10 @@ Anvi Bakers`;
             <p>
               10:00 AM - 9:00 PM
             </p>
-
           </div>
-
         </div>
 
         <div className="footer-bottom">
-
           <p>
             © 2026 Anvi Bakers.
             All Rights Reserved.
@@ -1644,11 +1386,8 @@ Anvi Bakers`;
           <p>
             Freshly Baked With Love
           </p>
-
         </div>
-
       </footer>
-
     </div>
   );
 }
