@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./index.css";
 import heroImage from "./assets/hero.png";
 
@@ -9,9 +9,9 @@ function App() {
   const [selectedWeight, setSelectedWeight] = useState("");
   const [quantity, setQuantity] = useState("");
   const [selectedPrice, setSelectedPrice] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [orderMessage, setOrderMessage] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // ================= PRODUCTS =================
 
@@ -164,7 +164,15 @@ function App() {
     },
   ];
 
-  const allProducts = [...cakes, ...pastries, ...cookies];
+  const allProducts = useMemo(
+    () => [...cakes, ...pastries, ...cookies],
+    []
+  );
+
+  // ================= DATE =================
+
+  const today = new Date();
+  const minDeliveryDate = today.toISOString().split("T")[0];
 
   // ================= HELPERS =================
 
@@ -180,16 +188,6 @@ function App() {
     })}`;
   };
 
-  const getTodayDate = () => {
-    const today = new Date();
-
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-  };
-
   const scrollToSection = (id) => {
     setMobileMenuOpen(false);
 
@@ -199,45 +197,31 @@ function App() {
     });
   };
 
-  // ================= PRICE CALCULATION =================
+  // ================= PRICE =================
 
   const calculatePrice = (
     item = selectedItem,
     weight = selectedWeight,
     qty = quantity
   ) => {
-    if (!item) {
-      return 0;
-    }
+    if (!item) return 0;
 
     const numericQuantity = Number(qty);
 
-    if (
-      !Number.isFinite(numericQuantity) ||
-      numericQuantity <= 0
-    ) {
+    if (!Number.isFinite(numericQuantity) || numericQuantity <= 0) {
       return 0;
     }
 
-    // CAKE
     if (item.pricePerKg) {
       const numericWeight = Number(weight);
 
-      if (
-        !Number.isFinite(numericWeight) ||
-        numericWeight <= 0
-      ) {
+      if (!Number.isFinite(numericWeight) || numericWeight <= 0) {
         return 0;
       }
 
-      return (
-        Number(item.pricePerKg) *
-        numericWeight *
-        numericQuantity
-      );
+      return Number(item.pricePerKg) * numericWeight * numericQuantity;
     }
 
-    // PASTRY / COOKIE
     if (item.price) {
       return Number(item.price) * numericQuantity;
     }
@@ -245,21 +229,19 @@ function App() {
     return 0;
   };
 
-  // ================= PRODUCT SELECTION =================
+  // ================= PRODUCT SELECT =================
 
   const selectProduct = (item) => {
     setSelectedItem(item);
     setSelectedWeight("");
     setQuantity("");
     setSelectedPrice(0);
-    setOrderMessage("");
+    setOrderSuccess(false);
 
     setTimeout(() => {
       scrollToSection("contact");
-    }, 50);
+    }, 100);
   };
-
-  // ================= PRODUCT CHANGE =================
 
   const handleProductChange = (e) => {
     const productName = e.target.value;
@@ -280,7 +262,6 @@ function App() {
     setSelectedWeight("");
     setQuantity("");
     setSelectedPrice(0);
-    setOrderMessage("");
   };
 
   // ================= WEIGHT =================
@@ -318,17 +299,13 @@ function App() {
   // ================= PHONE VALIDATION =================
 
   const validatePhone = (phone) => {
-    const cleanedPhone = phone.replace(/\D/g, "");
+    const cleaned = phone.replace(/\D/g, "");
 
-    if (cleanedPhone.length !== 10) {
+    if (cleaned.length !== 10) {
       return false;
     }
 
-    if (!/^[6-9]\d{9}$/.test(cleanedPhone)) {
-      return false;
-    }
-
-    return true;
+    return /^[6-9]\d{9}$/.test(cleaned);
   };
 
   // ================= ORDER =================
@@ -336,106 +313,75 @@ function App() {
   const handleOrder = (e) => {
     e.preventDefault();
 
-    setOrderMessage("");
+    if (isSubmitting) return;
 
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    const name =
-      formData.get("name")?.trim() || "";
+    const name = formData.get("name")?.trim();
+    const phone = formData.get("phone")?.trim();
+    const product = formData.get("product");
+    const date = formData.get("date");
 
-    const phone =
-      formData.get("phone")?.trim() || "";
-
-    const product =
-      formData.get("product")?.trim() || "";
-
-    const date =
-      formData.get("date")?.trim() || "";
-
-    const house =
-      formData.get("house")?.trim() || "";
-
-    const street =
-      formData.get("street")?.trim() || "";
+    const house = formData.get("house")?.trim();
+    const street = formData.get("street")?.trim();
+    const area = formData.get("area")?.trim();
+    const city = formData.get("city")?.trim();
+    const state = formData.get("state")?.trim();
+    const pincode = formData.get("pincode")?.trim();
 
     const landmark =
-      formData.get("landmark")?.trim() || "";
-
-    const city =
-      formData.get("city")?.trim() || "";
-
-    const state =
-      formData.get("state")?.trim() || "";
-
-    const pincode =
-      formData.get("pincode")?.trim() || "";
+      formData.get("landmark")?.trim() || "Not provided";
 
     const requirements =
-      formData.get("requirements")?.trim() ||
-      "None";
+      formData.get("requirements")?.trim() || "None";
 
-    // NAME VALIDATION
+    // NAME
 
-    if (name.length < 2) {
-      setOrderMessage(
-        "Please enter a valid name."
-      );
+    if (!name) {
+      alert("Please enter your name.");
       return;
     }
 
-    // PHONE VALIDATION
+    // PHONE
 
     if (!validatePhone(phone)) {
-      setOrderMessage(
-        "Please enter a valid 10-digit Indian mobile number."
+      alert(
+        "Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8 or 9."
       );
       return;
     }
 
-    // PRODUCT VALIDATION
+    // PRODUCT
 
-    if (!selectedItem || !product) {
-      setOrderMessage(
-        "Please select a product."
-      );
+    if (!product || !selectedItem) {
+      alert("Please select a product.");
       return;
     }
 
     // CAKE WEIGHT
 
-    if (
-      selectedItem.pricePerKg &&
-      !selectedWeight
-    ) {
-      setOrderMessage(
-        "Please select the cake weight."
-      );
+    if (selectedItem.pricePerKg && !selectedWeight) {
+      alert("Please select cake weight.");
       return;
     }
 
     // QUANTITY
 
-    if (!quantity) {
-      setOrderMessage(
-        "Please select the quantity."
-      );
+    if (!quantity || Number(quantity) <= 0) {
+      alert("Please select quantity.");
       return;
     }
 
     // DATE
 
     if (!date) {
-      setOrderMessage(
-        "Please select a delivery date."
-      );
+      alert("Please select delivery date.");
       return;
     }
 
-    if (date < getTodayDate()) {
-      setOrderMessage(
-        "Delivery date cannot be in the past."
-      );
+    if (date < minDeliveryDate) {
+      alert("Past delivery dates are not allowed.");
       return;
     }
 
@@ -444,26 +390,19 @@ function App() {
     if (
       !house ||
       !street ||
+      !area ||
       !city ||
       !state ||
       !pincode
     ) {
-      setOrderMessage(
-        "Please complete all required delivery address fields."
-      );
+      alert("Please complete your delivery address.");
       return;
     }
-
-    // PIN CODE
 
     if (!/^\d{6}$/.test(pincode)) {
-      setOrderMessage(
-        "Please enter a valid 6-digit PIN code."
-      );
+      alert("Please enter a valid 6-digit PIN code.");
       return;
     }
-
-    // PRICE
 
     const totalAmount = calculatePrice(
       selectedItem,
@@ -471,40 +410,27 @@ function App() {
       quantity
     );
 
-    if (
-      !Number.isFinite(totalAmount) ||
-      totalAmount <= 0
-    ) {
-      setOrderMessage(
+    if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
+      alert(
         "Please select product, weight and quantity correctly."
       );
       return;
     }
 
-    const finalPrice =
-      formatPrice(totalAmount);
+    setIsSubmitting(true);
 
-    const weightText =
-      selectedItem.pricePerKg
-        ? `${selectedWeight} Kg`
-        : "Not applicable";
-
-    // FULL ADDRESS
+    const weightText = selectedItem.pricePerKg
+      ? `${selectedWeight} Kg`
+      : "Not applicable";
 
     const fullAddress = [
       house,
       street,
-      landmark
-        ? `Landmark: ${landmark}`
-        : "",
+      area,
       city,
       state,
       `PIN: ${pincode}`,
-    ]
-      .filter(Boolean)
-      .join(", ");
-
-    // WHATSAPP MESSAGE
+    ].join(", ");
 
     const message = `Hello Anvi Bakers,
 
@@ -516,7 +442,7 @@ Customer Name:
 ${name}
 
 Phone Number:
-${phone}
++91 ${phone}
 
 Product:
 ${product}
@@ -528,7 +454,7 @@ Quantity:
 ${quantity}
 
 Total Price:
-${finalPrice}
+${formatPrice(totalAmount)}
 
 Delivery Date:
 ${date}
@@ -538,11 +464,11 @@ DELIVERY ADDRESS
 House / Flat:
 ${house}
 
-Street / Area:
+Street / Road:
 ${street}
 
-Landmark:
-${landmark || "Not provided"}
+Area / Locality:
+${area}
 
 City:
 ${city}
@@ -553,11 +479,13 @@ ${state}
 PIN Code:
 ${pincode}
 
-Complete Address:
+Landmark:
+${landmark}
+
+Full Address:
 ${fullAddress}
 
-SPECIAL REQUIREMENTS
-
+Special Requirements:
 ${requirements}
 
 Please confirm my order and delivery details.
@@ -565,31 +493,40 @@ Please confirm my order and delivery details.
 Thank you.
 Anvi Bakers`;
 
-    setIsSubmitting(true);
+    const whatsappURL =
+      `https://wa.me/${whatsappNumber}?text=` +
+      encodeURIComponent(message);
 
-    try {
-      const whatsappURL =
-        `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-          message
-        )}`;
+    setOrderSuccess(true);
 
+    setTimeout(() => {
       window.open(
         whatsappURL,
         "_blank",
         "noopener,noreferrer"
       );
 
-      setOrderMessage(
-        "Your order details are ready. Please send the WhatsApp message to confirm your order."
-      );
-    } catch (error) {
-      setOrderMessage(
-        "Something went wrong. Please try again or contact us directly on WhatsApp."
-      );
-    } finally {
       setIsSubmitting(false);
-    }
+    }, 500);
   };
+
+  // ================= ESCAPE MOBILE MENU =================
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
+  // ================= UI =================
 
   return (
     <div className="app">
@@ -598,94 +535,82 @@ Anvi Bakers`;
 
       <header className="navbar">
 
-        <div className="logo">
+        <div
+          className="logo"
+          onClick={() => scrollToSection("home")}
+          style={{ cursor: "pointer" }}
+        >
           <h1>Anvi</h1>
           <span>BAKERS</span>
         </div>
 
-        <button
-          type="button"
-          className="mobile-menu-btn"
-          onClick={() =>
-            setMobileMenuOpen(
-              !mobileMenuOpen
-            )
-          }
-          aria-label="Toggle navigation menu"
-        >
-          Menu
-        </button>
-
         <nav
           className={
             mobileMenuOpen
-              ? "nav-open"
-              : ""
+              ? "nav-menu mobile-open"
+              : "nav-menu"
           }
         >
           <a
             href="#home"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
+            onClick={() => setMobileMenuOpen(false)}
           >
             Home
           </a>
 
           <a
             href="#cakes"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
+            onClick={() => setMobileMenuOpen(false)}
           >
             Cakes
           </a>
 
           <a
             href="#pastries"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
+            onClick={() => setMobileMenuOpen(false)}
           >
             Pastries
           </a>
 
           <a
             href="#cookies"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
+            onClick={() => setMobileMenuOpen(false)}
           >
             Cookies
           </a>
 
           <a
             href="#about"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
+            onClick={() => setMobileMenuOpen(false)}
           >
             About
           </a>
 
           <a
             href="#contact"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
+            onClick={() => setMobileMenuOpen(false)}
           >
             Contact
           </a>
         </nav>
 
         <button
-          type="button"
           className="order-btn"
-          onClick={() =>
-            scrollToSection("contact")
-          }
+          onClick={() => scrollToSection("contact")}
         >
           Order Now
+        </button>
+
+        <button
+          className="mobile-menu-button"
+          type="button"
+          aria-label="Open navigation menu"
+          aria-expanded={mobileMenuOpen}
+          onClick={() =>
+            setMobileMenuOpen((prev) => !prev)
+          }
+        >
+          {mobileMenuOpen ? "Close" : "Menu"}
         </button>
 
       </header>
@@ -705,24 +630,20 @@ Anvi Bakers`;
             <h2>
               Sweet Moments,
               <br />
-              <span>
-                Beautifully Baked.
-              </span>
+              <span>Beautifully Baked.</span>
             </h2>
 
             <p className="description">
-              Delicious cakes, fresh
-              pastries and crunchy
-              cookies made specially
-              for your birthdays,
-              anniversaries and every
-              special moment.
+              Delicious cakes, fresh pastries
+              and crunchy cookies made
+              specially for your birthdays,
+              anniversaries and every special
+              moment.
             </p>
 
             <div className="hero-buttons">
 
               <button
-                type="button"
                 className="primary-btn"
                 onClick={() =>
                   scrollToSection("cakes")
@@ -732,7 +653,6 @@ Anvi Bakers`;
               </button>
 
               <button
-                type="button"
                 className="secondary-btn"
                 onClick={() =>
                   scrollToSection("contact")
@@ -746,33 +666,18 @@ Anvi Bakers`;
             <div className="features">
 
               <div>
-                <strong>
-                  100% Fresh
-                </strong>
-
-                <span>
-                  Made fresh daily
-                </span>
+                <strong>100% Fresh</strong>
+                <span>Made fresh daily</span>
               </div>
 
               <div>
-                <strong>
-                  Eggless Options
-                </strong>
-
-                <span>
-                  Perfect for everyone
-                </span>
+                <strong>Eggless Options</strong>
+                <span>Perfect for everyone</span>
               </div>
 
               <div>
-                <strong>
-                  Made With Love
-                </strong>
-
-                <span>
-                  For your special day
-                </span>
+                <strong>Made With Love</strong>
+                <span>For your special day</span>
               </div>
 
             </div>
@@ -785,7 +690,7 @@ Anvi Bakers`;
 
               <img
                 src={heroImage}
-                alt="Anvi Bakers Cake"
+                alt="Fresh cake from Anvi Bakers"
               />
 
             </div>
@@ -806,7 +711,6 @@ Anvi Bakers`;
       <section className="category-bar">
 
         <button
-          type="button"
           onClick={() =>
             scrollToSection("cakes")
           }
@@ -815,7 +719,6 @@ Anvi Bakers`;
         </button>
 
         <button
-          type="button"
           onClick={() =>
             scrollToSection("pastries")
           }
@@ -824,7 +727,6 @@ Anvi Bakers`;
         </button>
 
         <button
-          type="button"
           onClick={() =>
             scrollToSection("cookies")
           }
@@ -833,7 +735,6 @@ Anvi Bakers`;
         </button>
 
         <button
-          type="button"
           onClick={() =>
             scrollToSection("contact")
           }
@@ -858,14 +759,12 @@ Anvi Bakers`;
 
           <h2>
             Cakes For Every
-            <span>
-              {" "}Celebration
-            </span>
+            <span> Celebration</span>
           </h2>
 
           <p className="section-description">
-            Choose your favourite cake
-            and order it by weight.
+            Choose your favourite cake and
+            order it by weight.
           </p>
 
         </div>
@@ -885,6 +784,10 @@ Anvi Bakers`;
                   src={cake.image}
                   alt={cake.name}
                   loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.style.display =
+                      "none";
+                  }}
                 />
 
                 <span>Fresh</span>
@@ -893,26 +796,19 @@ Anvi Bakers`;
 
               <div className="product-info">
 
-                <small>
-                  {cake.category}
-                </small>
+                <small>{cake.category}</small>
 
-                <h3>
-                  {cake.name}
-                </h3>
+                <h3>{cake.name}</h3>
 
                 <p className="price-info">
                   Starting from{" "}
                   <strong>
-                    {formatPrice(
-                      cake.pricePerKg
-                    )}
+                    {formatPrice(cake.pricePerKg)}
                     /kg
                   </strong>
                 </p>
 
                 <button
-                  type="button"
                   className="product-order"
                   onClick={() =>
                     selectProduct(cake)
@@ -946,14 +842,11 @@ Anvi Bakers`;
 
           <h2>
             Delicious
-            <span>
-              {" "}Pastries
-            </span>
+            <span> Pastries</span>
           </h2>
 
           <p className="section-description">
-            Perfect for a quick sweet
-            treat.
+            Perfect for a quick sweet treat.
           </p>
 
         </div>
@@ -973,6 +866,10 @@ Anvi Bakers`;
                   src={item.image}
                   alt={item.name}
                   loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.style.display =
+                      "none";
+                  }}
                 />
 
                 <span>Fresh</span>
@@ -981,13 +878,9 @@ Anvi Bakers`;
 
               <div className="product-info">
 
-                <small>
-                  {item.category}
-                </small>
+                <small>{item.category}</small>
 
-                <h3>
-                  {item.name}
-                </h3>
+                <h3>{item.name}</h3>
 
                 <p className="price-info">
                   <strong>
@@ -997,7 +890,6 @@ Anvi Bakers`;
                 </p>
 
                 <button
-                  type="button"
                   className="product-order"
                   onClick={() =>
                     selectProduct(item)
@@ -1031,9 +923,7 @@ Anvi Bakers`;
 
           <h2>
             Crunchy &
-            <span>
-              {" "}Delicious Cookies
-            </span>
+            <span> Delicious Cookies</span>
           </h2>
 
           <p className="section-description">
@@ -1058,6 +948,10 @@ Anvi Bakers`;
                   src={item.image}
                   alt={item.name}
                   loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.style.display =
+                      "none";
+                  }}
                 />
 
                 <span>Fresh</span>
@@ -1066,13 +960,9 @@ Anvi Bakers`;
 
               <div className="product-info">
 
-                <small>
-                  {item.category}
-                </small>
+                <small>{item.category}</small>
 
-                <h3>
-                  {item.name}
-                </h3>
+                <h3>{item.name}</h3>
 
                 <p className="price-info">
                   <strong>
@@ -1082,7 +972,6 @@ Anvi Bakers`;
                 </p>
 
                 <button
-                  type="button"
                   className="product-order"
                   onClick={() =>
                     selectProduct(item)
@@ -1127,29 +1016,24 @@ Anvi Bakers`;
           <h2>
             Baking Happiness,
             <br />
-            <span>
-              One Treat At A Time.
-            </span>
+            <span>One Treat At A Time.</span>
           </h2>
 
           <p>
             From celebration cakes to
-            delicious pastries and
-            freshly baked cookies,
-            Anvi Bakers brings
-            something sweet for
+            delicious pastries and freshly
+            baked cookies, Anvi Bakers
+            brings something sweet for
             every occasion.
           </p>
 
           <p>
-            Every product is prepared
-            with quality ingredients,
-            attention to detail and
-            lots of love.
+            Every product is prepared with
+            quality ingredients, attention
+            to detail and lots of love.
           </p>
 
           <button
-            type="button"
             className="primary-btn"
             onClick={() =>
               scrollToSection("contact")
@@ -1177,9 +1061,7 @@ Anvi Bakers`;
 
           <h2>
             Let's Make Something
-            <span>
-              {" "}Sweet.
-            </span>
+            <span> Sweet.</span>
           </h2>
 
           <p>
@@ -1196,9 +1078,7 @@ Anvi Bakers`;
 
           <div className="contact-info">
 
-            <h3>
-              Anvi Bakers
-            </h3>
+            <h3>Anvi Bakers</h3>
 
             <p>
               Fresh cakes, pastries and
@@ -1208,9 +1088,7 @@ Anvi Bakers`;
 
             <div className="contact-item">
 
-              <strong>
-                WhatsApp
-              </strong>
+              <strong>WhatsApp</strong>
 
               <span>
                 +91 9198299898
@@ -1220,9 +1098,7 @@ Anvi Bakers`;
 
             <div className="contact-item">
 
-              <strong>
-                Location
-              </strong>
+              <strong>Location</strong>
 
               <span>
                 Ayodhya, Uttar Pradesh
@@ -1232,9 +1108,7 @@ Anvi Bakers`;
 
             <div className="contact-item">
 
-              <strong>
-                Opening Hours
-              </strong>
+              <strong>Opening Hours</strong>
 
               <span>
                 10:00 AM - 9:00 PM
@@ -1249,7 +1123,6 @@ Anvi Bakers`;
           <form
             className="order-form"
             onSubmit={handleOrder}
-            noValidate
           >
 
             {/* NAME + PHONE */}
@@ -1258,16 +1131,15 @@ Anvi Bakers`;
 
               <div className="form-group">
 
-                <label htmlFor="name">
-                  Your Name
+                <label>
+                  Your Name *
                 </label>
 
                 <input
-                  id="name"
                   type="text"
                   name="name"
                   placeholder="Enter your name"
-                  minLength="2"
+                  autoComplete="name"
                   maxLength="60"
                   required
                 />
@@ -1276,24 +1148,18 @@ Anvi Bakers`;
 
               <div className="form-group">
 
-                <label htmlFor="phone">
-                  Phone Number
+                <label>
+                  Phone Number *
                 </label>
 
                 <input
-                  id="phone"
                   type="tel"
                   name="phone"
                   placeholder="10-digit mobile number"
                   inputMode="numeric"
+                  autoComplete="tel"
                   maxLength="10"
                   pattern="[6-9][0-9]{9}"
-                  onInput={(e) => {
-                    e.target.value =
-                      e.target.value
-                        .replace(/\D/g, "")
-                        .slice(0, 10);
-                  }}
                   required
                 />
 
@@ -1305,12 +1171,11 @@ Anvi Bakers`;
 
             <div className="form-group">
 
-              <label htmlFor="product">
-                Product
+              <label>
+                Product *
               </label>
 
               <select
-                id="product"
                 name="product"
                 value={
                   selectedItem?.name || ""
@@ -1380,12 +1245,11 @@ Anvi Bakers`;
 
               <div className="form-group">
 
-                <label htmlFor="weight">
-                  Select Cake Weight
+                <label>
+                  Select Cake Weight *
                 </label>
 
                 <select
-                  id="weight"
                   name="weight"
                   value={selectedWeight}
                   onChange={
@@ -1414,6 +1278,14 @@ Anvi Bakers`;
                     3 Kg
                   </option>
 
+                  <option value="4">
+                    4 Kg
+                  </option>
+
+                  <option value="5">
+                    5 Kg
+                  </option>
+
                 </select>
 
               </div>
@@ -1426,12 +1298,11 @@ Anvi Bakers`;
 
               <div className="form-group">
 
-                <label htmlFor="quantity">
-                  Quantity
+                <label>
+                  Quantity *
                 </label>
 
                 <select
-                  id="quantity"
                   name="quantity"
                   value={quantity}
                   onChange={
@@ -1444,37 +1315,14 @@ Anvi Bakers`;
                     Select Quantity
                   </option>
 
-                  <option value="1">
-                    1
-                  </option>
-
-                  <option value="2">
-                    2
-                  </option>
-
-                  <option value="3">
-                    3
-                  </option>
-
-                  <option value="4">
-                    4
-                  </option>
-
-                  <option value="5">
-                    5
-                  </option>
-
-                  <option value="6">
-                    6
-                  </option>
-
-                  <option value="10">
-                    10
-                  </option>
-
-                  <option value="20">
-                    20
-                  </option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="10">10</option>
+                  <option value="20">20</option>
 
                 </select>
 
@@ -1482,15 +1330,14 @@ Anvi Bakers`;
 
               <div className="form-group">
 
-                <label htmlFor="date">
-                  Delivery Date
+                <label>
+                  Delivery Date *
                 </label>
 
                 <input
-                  id="date"
                   type="date"
                   name="date"
-                  min={getTodayDate()}
+                  min={minDeliveryDate}
                   required
                 />
 
@@ -1500,28 +1347,23 @@ Anvi Bakers`;
 
             {/* DELIVERY ADDRESS */}
 
-            <div className="form-group">
-
-              <label>
-                Delivery Address
-              </label>
-
+            <div className="address-title">
+              Delivery Address
             </div>
 
             <div className="form-row">
 
               <div className="form-group">
 
-                <label htmlFor="house">
-                  House / Flat
+                <label>
+                  House / Flat *
                 </label>
 
                 <input
-                  id="house"
                   type="text"
                   name="house"
-                  placeholder="House / Flat / Shop No."
-                  maxLength="100"
+                  placeholder="House / Flat No."
+                  autoComplete="address-line1"
                   required
                 />
 
@@ -1529,36 +1371,19 @@ Anvi Bakers`;
 
               <div className="form-group">
 
-                <label htmlFor="street">
-                  Street / Area
+                <label>
+                  Street / Road *
                 </label>
 
                 <input
-                  id="street"
                   type="text"
                   name="street"
-                  placeholder="Street / Colony / Area"
-                  maxLength="150"
+                  placeholder="Street / Road"
+                  autoComplete="address-line2"
                   required
                 />
 
               </div>
-
-            </div>
-
-            <div className="form-group">
-
-              <label htmlFor="landmark">
-                Landmark
-              </label>
-
-              <input
-                id="landmark"
-                type="text"
-                name="landmark"
-                placeholder="Nearby landmark"
-                maxLength="150"
-              />
 
             </div>
 
@@ -1566,35 +1391,31 @@ Anvi Bakers`;
 
               <div className="form-group">
 
-                <label htmlFor="city">
-                  City
+                <label>
+                  Area / Locality *
                 </label>
 
                 <input
-                  id="city"
+                  type="text"
+                  name="area"
+                  placeholder="Area / Locality"
+                  required
+                />
+
+              </div>
+
+              <div className="form-group">
+
+                <label>
+                  City *
+                </label>
+
+                <input
                   type="text"
                   name="city"
                   placeholder="City"
+                  autoComplete="address-level2"
                   defaultValue="Ayodhya"
-                  maxLength="80"
-                  required
-                />
-
-              </div>
-
-              <div className="form-group">
-
-                <label htmlFor="state">
-                  State
-                </label>
-
-                <input
-                  id="state"
-                  type="text"
-                  name="state"
-                  placeholder="State"
-                  defaultValue="Uttar Pradesh"
-                  maxLength="80"
                   required
                 />
 
@@ -1602,27 +1423,59 @@ Anvi Bakers`;
 
             </div>
 
+            <div className="form-row">
+
+              <div className="form-group">
+
+                <label>
+                  State *
+                </label>
+
+                <input
+                  type="text"
+                  name="state"
+                  placeholder="State"
+                  autoComplete="address-level1"
+                  defaultValue="Uttar Pradesh"
+                  required
+                />
+
+              </div>
+
+              <div className="form-group">
+
+                <label>
+                  PIN Code *
+                </label>
+
+                <input
+                  type="text"
+                  name="pincode"
+                  placeholder="6-digit PIN"
+                  inputMode="numeric"
+                  maxLength="6"
+                  pattern="[0-9]{6}"
+                  autoComplete="postal-code"
+                  required
+                />
+
+              </div>
+
+            </div>
+
+            {/* LANDMARK */}
+
             <div className="form-group">
 
-              <label htmlFor="pincode">
-                PIN Code
+              <label>
+                Landmark / Area
               </label>
 
               <input
-                id="pincode"
                 type="text"
-                name="pincode"
-                placeholder="6-digit PIN code"
-                inputMode="numeric"
-                maxLength="6"
-                pattern="[0-9]{6}"
-                onInput={(e) => {
-                  e.target.value =
-                    e.target.value
-                      .replace(/\D/g, "")
-                      .slice(0, 6);
-                }}
-                required
+                name="landmark"
+                placeholder="Nearby landmark"
+                maxLength="100"
               />
 
             </div>
@@ -1647,36 +1500,33 @@ Anvi Bakers`;
 
             </div>
 
-            {/* ORDER MESSAGE */}
-
-            {orderMessage && (
-
-              <div
-                className="order-message"
-                role="status"
-              >
-                {orderMessage}
-              </div>
-
-            )}
-
             {/* SPECIAL REQUIREMENTS */}
 
             <div className="form-group">
 
-              <label htmlFor="requirements">
+              <label>
                 Special Requirements
               </label>
 
               <textarea
-                id="requirements"
                 name="requirements"
                 rows="5"
-                maxLength="1000"
                 placeholder="Cake message, design, flavour, custom requirements..."
+                maxLength="500"
               />
 
             </div>
+
+            {/* SUCCESS */}
+
+            {orderSuccess && (
+
+              <div className="order-success">
+                Order details prepared successfully.
+                WhatsApp is opening now.
+              </div>
+
+            )}
 
             {/* SUBMIT */}
 
@@ -1706,20 +1556,15 @@ Anvi Bakers`;
 
             <div className="logo footer-logo">
 
-              <h1>
-                Anvi
-              </h1>
+              <h1>Anvi</h1>
 
-              <span>
-                BAKERS
-              </span>
+              <span>BAKERS</span>
 
             </div>
 
             <p>
-              Freshly baked cakes,
-              pastries and cookies
-              made with love.
+              Freshly baked cakes, pastries
+              and cookies made with love.
             </p>
 
             <a
@@ -1735,37 +1580,19 @@ Anvi Bakers`;
 
           <div className="footer-column">
 
-            <h4>
-              Explore
-            </h4>
+            <h4>Explore</h4>
 
-            <a href="#home">
-              Home
-            </a>
-
-            <a href="#cakes">
-              Cakes
-            </a>
-
-            <a href="#pastries">
-              Pastries
-            </a>
-
-            <a href="#cookies">
-              Cookies
-            </a>
-
-            <a href="#about">
-              About Us
-            </a>
+            <a href="#home">Home</a>
+            <a href="#cakes">Cakes</a>
+            <a href="#pastries">Pastries</a>
+            <a href="#cookies">Cookies</a>
+            <a href="#about">About Us</a>
 
           </div>
 
           <div className="footer-column">
 
-            <h4>
-              Categories
-            </h4>
+            <h4>Categories</h4>
 
             <a href="#cakes">
               Birthday Cakes
@@ -1791,13 +1618,9 @@ Anvi Bakers`;
 
           <div className="footer-column">
 
-            <h4>
-              Contact
-            </h4>
+            <h4>Contact</h4>
 
-            <p>
-              +91 9198299898
-            </p>
+            <p>+91 9198299898</p>
 
             <p>
               Ayodhya, Uttar Pradesh
