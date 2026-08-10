@@ -1820,9 +1820,9 @@ Anvi Bakers`;
                   Location
                 </strong>
 
-                <span>
-                  Ayodhya, Uttar Pradesh
-                </span>
+               <span>
+  Khanpur Masodha, Ayodhya, Uttar Pradesh
+</span>
               </div>
 
               <div className="contact-item">
