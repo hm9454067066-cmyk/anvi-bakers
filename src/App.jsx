@@ -740,187 +740,170 @@ Anvi Bakers`;
   return (
     <div className="app">
 
-      {/* ================= HEADER ================= */}
+    {/* ================= HEADER ================= */}
 
-      <header className="header">
-        <button
-          type="button"
-          className="logo"
-          onClick={() =>
-            scrollToSection("home")
-          }
-          aria-label="Go to homepage"
-        >
-          <span className="logo-main">
-            Anvi
-          </span>
+<header className="navbar">
 
-          <span className="logo-sub">
-            BAKERS
-          </span>
-        </button>
+  <div className="navbar-inner">
 
-        <nav className="nav-links">
-          <a href="#home">Home</a>
-          <a href="#cakes">Cakes</a>
-          <a href="#pastries">Pastries</a>
-          <a href="#cream-rolls">
-            Cream Rolls
-          </a>
-          <a href="#patties">Patties</a>
-          <a href="#muffins">Muffins</a>
-          <a href="#cookies">Cookies</a>
-          <a href="#cold-drinks">
-            Cold Drinks
-          </a>
-          <a href="#about">About</a>
-          <a href="#contact">Contact</a>
+    {/* LOGO */}
+    <button
+      type="button"
+      className="logo"
+      onClick={() => scrollToSection("home")}
+      aria-label="Go to homepage"
+    >
+      <span className="logo-main">Anvi</span>
+      <span className="logo-sub">BAKERS</span>
+    </button>
 
-          <button
-            type="button"
-            className="order-btn desktop-order-btn"
-            onClick={() =>
-              scrollToSection("contact")
-            }
-          >
-            Order Now
-          </button>
 
-          <button
-            type="button"
-            className={`mobile-menu-btn ${
-              mobileMenuOpen
-                ? "active"
-                : ""
-            }`}
-            aria-label="Toggle menu"
-            aria-expanded={
-              mobileMenuOpen
-            }
-            onClick={() =>
-              setMobileMenuOpen(
-                (previous) =>
-                  !previous
-              )
-            }
-          >
-            <span />
-            <span />
-            <span />
-          </button>
-        </nav>
+    {/* DESKTOP NAV LINKS */}
+    <nav className="nav-links">
 
-        <nav
-          className={`mobile-menu ${
-            mobileMenuOpen
-              ? "open"
-              : ""
-          }`}
-        >
-          <a
-            href="#home"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
-          >
-            Home
-          </a>
+      <a href="#home">Home</a>
+      <a href="#cakes">Cakes</a>
+      <a href="#pastries">Pastries</a>
+      <a href="#cream-rolls">Cream Rolls</a>
+      <a href="#patties">Patties</a>
+      <a href="#muffins">Muffins</a>
+      <a href="#cookies">Cookies</a>
+      <a href="#cold-drinks">Cold Drinks</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
 
-          <a
-            href="#cakes"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
-          >
-            Cakes
-          </a>
+    </nav>
 
-          <a
-            href="#pastries"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
-          >
-            Pastries
-          </a>
 
-          <a
-            href="#cream-rolls"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
-          >
-            Cream Rolls
-          </a>
+    {/* DESKTOP ORDER BUTTON */}
+    <button
+      type="button"
+      className="order-btn desktop-order-btn"
+      onClick={() => scrollToSection("contact")}
+    >
+      Order Now
+    </button>
 
-          <a
-            href="#patties"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
-          >
-            Patties
-          </a>
 
-          <a
-            href="#muffins"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
-          >
-            Muffins
-          </a>
+    {/* MOBILE MENU BUTTON */}
+    <button
+      type="button"
+      className={`mobile-menu-btn ${
+        mobileMenuOpen ? "active" : ""
+      }`}
+      aria-label={
+        mobileMenuOpen
+          ? "Close menu"
+          : "Open menu"
+      }
+      aria-expanded={mobileMenuOpen}
+      onClick={() =>
+        setMobileMenuOpen(
+          (previous) => !previous
+        )
+      }
+    >
+      <span />
+      <span />
+      <span />
+    </button>
 
-          <a
-            href="#cookies"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
-          >
-            Cookies
-          </a>
+  </div>
 
-          <a
-            href="#cold-drinks"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
-          >
-            Cold Drinks
-          </a>
 
-          <a
-            href="#about"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
-          >
-            About
-          </a>
+  {/* MOBILE MENU */}
+  <nav
+    className={`mobile-menu ${
+      mobileMenuOpen ? "open" : ""
+    }`}
+  >
 
-          <a
-            href="#contact"
-            onClick={() =>
-              setMobileMenuOpen(false)
-            }
-          >
-            Contact
-          </a>
+    <a
+      href="#home"
+      onClick={() => setMobileMenuOpen(false)}
+    >
+      Home
+    </a>
 
-          <button
-            type="button"
-            className="mobile-order-btn"
-            onClick={() =>
-              scrollToSection("contact")
-            }
-          >
-            Order Now
-          </button>
-        </nav>
-      </header>
+    <a
+      href="#cakes"
+      onClick={() => setMobileMenuOpen(false)}
+    >
+      Cakes
+    </a>
 
-      {/* ================= MAIN ================= */}
+    <a
+      href="#pastries"
+      onClick={() => setMobileMenuOpen(false)}
+    >
+      Pastries
+    </a>
 
+    <a
+      href="#cream-rolls"
+      onClick={() => setMobileMenuOpen(false)}
+    >
+      Cream Rolls
+    </a>
+
+    <a
+      href="#patties"
+      onClick={() => setMobileMenuOpen(false)}
+    >
+      Patties
+    </a>
+
+    <a
+      href="#muffins"
+      onClick={() => setMobileMenuOpen(false)}
+    >
+      Muffins
+    </a>
+
+    <a
+      href="#cookies"
+      onClick={() => setMobileMenuOpen(false)}
+    >
+      Cookies
+    </a>
+
+    <a
+      href="#cold-drinks"
+      onClick={() => setMobileMenuOpen(false)}
+    >
+      Cold Drinks
+    </a>
+
+    <a
+      href="#about"
+      onClick={() => setMobileMenuOpen(false)}
+    >
+      About
+    </a>
+
+    <a
+      href="#contact"
+      onClick={() => setMobileMenuOpen(false)}
+    >
+      Contact
+    </a>
+
+    <button
+      type="button"
+      className="mobile-order-btn"
+      onClick={() => {
+        setMobileMenuOpen(false);
+        scrollToSection("contact");
+      }}
+    >
+      Order Now
+    </button>
+
+  </nav>
+
+</header>
+
+{/* ================= MAIN ================= */}
       <main>
 
         {/* ================= HERO ================= */}

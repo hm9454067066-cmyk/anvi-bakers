@@ -3192,3 +3192,69 @@ body {
     height: 38px;
   }
 }
+
+/* =========================
+   DESKTOP NAVBAR FINAL FIX
+   ========================= */
+
+@media (min-width: 901px) {
+
+  .navbar-inner {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+  }
+
+  /* LEFT — LOGO */
+  .navbar-inner .logo {
+    flex-shrink: 0;
+  }
+
+  /* CENTER — NAVIGATION */
+  .navbar-inner .nav-links {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 24px;
+
+    margin: 0;
+
+    white-space: nowrap;
+  }
+
+  /* RIGHT — ORDER NOW */
+  .navbar-inner .desktop-order-btn {
+    display: inline-flex;
+
+    margin-left: auto;
+
+    flex-shrink: 0;
+
+    min-height: 46px;
+    padding: 12px 23px;
+
+    white-space: nowrap;
+  }
+
+  /* DESKTOP PAR MOBILE BUTTON NAHI */
+  .navbar-inner .mobile-menu-btn {
+    display: none;
+  }
+
+  /* DESKTOP PAR MOBILE MENU NAHI */
+  .mobile-menu {
+    display: none;
+  }
+}
