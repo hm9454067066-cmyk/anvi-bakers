@@ -126,16 +126,13 @@ textarea {
 .navbar-inner {
   width: 100%;
   max-width: var(--max-width);
-
   min-height: 82px;
-
   margin: 0 auto;
-  padding: 14px 6%;
-
+  padding: 14px 4%;
   display: flex;
   align-items: center;
-
-  gap: 25px;
+  gap: 18px;
+  box-sizing: border-box;
 }
 
 /* =========================================================
@@ -193,24 +190,21 @@ textarea {
 .nav-links {
   display: flex;
   align-items: center;
-
-  gap: 28px;
-
+  justify-content: flex-end;
+  gap: clamp(12px, 1.5vw, 24px);
   margin-left: auto;
+  min-width: 0;
+  white-space: nowrap;
 }
 
 .nav-links a {
   position: relative;
-
   padding: 8px 0;
-
   color: #453638;
-
   text-decoration: none;
-
-  font-size: 14px;
+  font-size: clamp(12px, 1.05vw, 14px);
   font-weight: 600;
-
+  white-space: nowrap;
   transition: color 0.2s ease;
 }
 
@@ -1528,12 +1522,35 @@ textarea {
 
 @media (max-width: 1100px) {
   .navbar-inner {
-    padding-left: 4%;
-    padding-right: 4%;
+    padding-left: 3%;
+    padding-right: 3%;
+    gap: 16px;
+  }
+
+  .logo-main {
+    font-size: 28px;
+  }
+
+  .logo-sub {
+    font-size: 8px;
+    letter-spacing: 4px;
   }
 
   .nav-links {
-    gap: 18px;
+    gap: 14px;
+    margin-left: auto;
+  }
+
+  .nav-links a {
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .order-btn {
+    padding: 10px 15px;
+    min-height: 42px;
+    font-size: 12px;
+    white-space: nowrap;
   }
 
   .hero {
@@ -1571,6 +1588,7 @@ textarea {
     min-width: 0;
   }
 }
+
 /* =========================================================
    TABLET
    ========================================================= */
@@ -1578,8 +1596,8 @@ textarea {
 @media (max-width: 900px) {
   .navbar-inner {
     min-height: 72px;
-
     padding: 12px 4%;
+    gap: 0;
   }
 
   .nav-links,
@@ -1589,15 +1607,16 @@ textarea {
 
   .mobile-menu-btn {
     display: flex;
+    flex-shrink: 0;
   }
 
   .mobile-menu {
     position: absolute;
-
     top: 100%;
     left: 0;
 
     width: 100%;
+    box-sizing: border-box;
 
     padding: 0 5%;
 
@@ -1643,6 +1662,7 @@ textarea {
 
   .mobile-menu a {
     width: 100%;
+    box-sizing: border-box;
 
     padding: 15px 10px;
 
@@ -1664,6 +1684,7 @@ textarea {
 
   .mobile-order-btn {
     width: 100%;
+    box-sizing: border-box;
 
     margin-top: 15px;
 
@@ -1766,6 +1787,8 @@ textarea {
     min-height: 70px;
 
     padding: 11px 4%;
+
+    gap: 0;
   }
 
   .logo-main {
@@ -1781,6 +1804,8 @@ textarea {
   .mobile-menu-btn {
     width: 42px;
     height: 42px;
+
+    flex-shrink: 0;
   }
 
   .hero {
