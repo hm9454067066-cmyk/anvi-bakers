@@ -775,14 +775,7 @@ Anvi Bakers`;
     </nav>
 
 
-    {/* DESKTOP ORDER BUTTON */}
-    <button
-      type="button"
-      className="order-btn desktop-order-btn"
-      onClick={() => scrollToSection("contact")}
-    >
-      Order Now
-    </button>
+    
 
 
     {/* MOBILE MENU BUTTON */}
