@@ -397,7 +397,7 @@ function App() {
         {!imageErrors[key] ? (
           <img
             src={item.image}
-            alt={`${item.name} - Anvi Bakers`}
+            alt={`${item.name} from Anvi Bakers bakery in Ayodhya`}
             loading="lazy"
             onError={() => handleImageError(key)}
           />
@@ -912,10 +912,10 @@ Anvi Bakers`;
             </p>
 
             <h1>
-              Sweet Moments,
+              Fresh Cakes & Bakery Treats in
               <br />
               <span>
-                Beautifully Baked.
+                Ayodhya, Uttar Pradesh.
               </span>
             </h1>
 
@@ -989,7 +989,7 @@ Anvi Bakers`;
             <div className="hero-image-frame">
               <img
                 src={heroImage}
-                alt="Fresh cake from Anvi Bakers"
+                alt="Fresh cake from Anvi Bakers bakery in Ayodhya"
               />
             </div>
 
@@ -1690,7 +1690,7 @@ Anvi Bakers`;
           <div className="about-image">
             <img
               src="https://images.unsplash.com/photo-1519869325930-281384150729?auto=format&fit=crop&w=1000&q=90"
-              alt="Freshly baked products at Anvi Bakers"
+              alt="Freshly baked cakes and bakery products at Anvi Bakers in Ayodhya"
               loading="lazy"
             />
           </div>
@@ -1797,7 +1797,7 @@ Anvi Bakers`;
                 </strong>
 
                <span>
-  Khanpur Masodha, Ayodhya, Uttar Pradesh
+  Khanpur Masodha, Jyoti Sadan, Ayodhya, Uttar Pradesh
 </span>
               </div>
 
@@ -2533,7 +2533,7 @@ Anvi Bakers`;
             </p>
 
             <p>
-              Khanpur Masodha, Ayodhya, Uttar Pradesh
+              Khanpur Masodha, Jyoti Sadan, Ayodhya, Uttar Pradesh
             </p>
 
             <p>
